@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<title>Huevos Interprice</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --olive-900:#232b1f;
+  --olive-700:#3a4a32;
+  --pulp:#faf4e6;
+  --pulp-dim:#efe6d0;
+  --yolk:#e8a33d;
+  --yolk-dark:#c9821f;
+  --brick:#b1472e;
+  --ink:#23281f;
+  --ink-soft:#5c6153;
+  --line:#ddd2ae;
+  --ok:#4c7a4c;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--olive-900);}
+body{
+  font-family:'Work Sans',sans-serif;
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
+}
+#root{
+  max-width:480px;
+  margin:0 auto;
+  background:var(--pulp);
+  min-height:100vh;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+}
+.topbar{
+  background:var(--olive-900);
+  color:var(--pulp);
+  padding:18px 20px 16px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  border-bottom:3px solid var(--yolk);
+}
+.topbar .brand{
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:20px;
+  letter-spacing:0.2px;
+}
+.topbar .brand small{
+  display:block;
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:500;
+  font-size:10px;
+  letter-spacing:1.5px;
+  color:var(--yolk);
+  margin-top:2px;
+}
+.topbar .clock{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:#c9c2a4;
+  text-align:right;
+}
+.view{
+  flex:1;
+  padding:16px 16px 96px;
+  overflow-y:auto;
+}
+.hide{display:none !important;}
+
+/* Cards */
+.stat-row{display:flex;gap:10px;margin-bottom:14px;}
+.stat-card{
+  flex:1;
+  background:var(--olive-900);
+  color:var(--pulp);
+  border-radius:14px;
+  padding:14px 12px;
+  position:relative;
+  overflow:hidden;
+}
+.stat-card .egg{
+  position:absolute;
+  right:-10px;
+  top:-14px;
+  width:52px;
+  height:64px;
+  border-radius:50% 50% 46% 46%/58% 58% 42% 42%;
+  background:rgba(232,163,61,0.14);
+}
+.stat-card .lbl{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9.5px;
+  letter-spacing:1.2px;
+  color:var(--yolk);
+  text-transform:uppercase;
+}
+.stat-card .val{
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:20px;
+  margin-top:4px;
+}
+.stat-card .sub{font-size:10.5px;color:#b9b39a;margin-top:2px;}
+
+.section-title{
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:16px;
+  margin:20px 0 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.section-title .tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9.5px;
+  background:var(--yolk);
+  color:var(--olive-900);
+  padding:2px 6px;
+  border-radius:20px;
+  font-weight:600;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:9px;
+}
+.prod-row{display:flex;justify-content:space-between;align-items:center;}
+.prod-name{font-weight:600;font-size:14px;}
+.prod-code{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
+.prod-stock{text-align:right;}
+.prod-stock .n{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:16px;}
+.prod-stock .u{font-size:9.5px;color:var(--ink-soft);}
+.low{color:var(--brick) !important;}
+
+/* Forms */
+label{
+  display:block;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin:14px 0 6px;
+}
+select,input{
+  width:100%;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  font-family:'Work Sans',sans-serif;
+  font-size:15px;
+  color:var(--ink);
+}
+select:focus,input:focus{outline:2px solid var(--yolk-dark);outline-offset:1px;}
+.total-box{
+  margin-top:16px;
+  background:var(--olive-900);
+  color:var(--pulp);
+  border-radius:12px;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.total-box .t-lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--yolk);}
+.total-box .t-val{font-family:'Fraunces',serif;font-weight:700;font-size:22px;}
+.btn-main{
+  width:100%;
+  margin-top:16px;
+  padding:15px;
+  border:none;
+  border-radius:12px;
+  background:var(--yolk-dark);
+  color:#fff;
+  font-family:'Work Sans',sans-serif;
+  font-weight:600;
+  font-size:15px;
+  letter-spacing:0.3px;
+}
+.btn-main:active{transform:scale(0.98);}
+.toggle-row{display:flex;gap:8px;}
+.toggle-opt{
+  flex:1;
+  text-align:center;
+  padding:10px;
+  border-radius:10px;
+  border:1.5px solid var(--line);
+  font-size:13px;
+  font-weight:500;
+  color:var(--ink-soft);
+  background:#fff;
+}
+.toggle-opt.active{
+  background:var(--olive-700);
+  border-color:var(--olive-700);
+  color:#fff;
+}
+
+/* Movements list */
+.mov{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--line);
+}
+.mov:last-child{border-bottom:none;}
+.mov-left{display:flex;gap:10px;align-items:center;}
+.mov-badge{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+  color:#fff;flex-shrink:0;
+}
+.mov-badge.venta{background:var(--ok);}
+.mov-badge.compra{background:var(--brick);}
+.mov-name{font-size:13.5px;font-weight:600;}
+.mov-sub{font-size:11px;color:var(--ink-soft);}
+.mov-val{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;}
+
+/* Bottom nav */
+.navbar{
+  position:sticky;
+  bottom:0;
+  max-width:480px;
+  margin:0 auto;
+  background:var(--olive-900);
+  display:flex;
+  border-top:1px solid #3a4632;
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+}
+.nav-btn{
+  flex:1;
+  background:none;
+  border:none;
+  color:#8b9179;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  padding:6px 2px;
+  font-family:'Work Sans',sans-serif;
+  font-size:9.5px;
+  border-radius:10px;
+}
+.nav-btn.active{color:var(--yolk);}
+.nav-btn svg{width:20px;height:20px;}
+
+/* Stamp confirmation */
+.stamp-overlay{
+  position:fixed;inset:0;
+  background:rgba(35,40,31,0.55);
+  display:flex;align-items:center;justify-content:center;
+  z-index:50;
+}
+.stamp{
+  background:var(--pulp);
+  border:3px solid var(--brick);
+  color:var(--brick);
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:22px;
+  padding:18px 30px;
+  border-radius:10px;
+  transform:rotate(-6deg);
+  text-align:center;
+  letter-spacing:1px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+.stamp .sub{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--ink-soft);
+  margin-top:4px;
+  letter-spacing:0.5px;
+}
+
+.empty{
+  text-align:center;
+  padding:30px 10px;
+  color:var(--ink-soft);
+  font-size:13px;
+}
+.install-banner{
+  background:var(--pulp-dim);
+  border:1px dashed var(--yolk-dark);
+  border-radius:12px;
+  padding:12px 14px;
+  font-size:12px;
+  color:var(--ink-soft);
+  margin-bottom:16px;
+  line-height:1.5;
+}
+.install-banner b{color:var(--ink);}
+.close-x{float:right;background:none;border:none;font-size:14px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const { useState, useEffect, useMemo } = React ? null : {}; // placeholder guard (React not loaded, plain JS below)
+</script>
+
+<script>
+// ---------- Seed data (from HUEVOS INTERPRICE excel) ----------
+const SEED = {
+  productos: [
+    {codigo:'A001', nombre:'HUEVO CAMPESINO', stock:20, costo:11000, precio:14000},
+    {codigo:'A002', nombre:'HUEVO TIPO A', stock:0, costo:0, precio:0},
+    {codigo:'A003', nombre:'HUEVO TIPO AA', stock:0, costo:0, precio:0},
+    {codigo:'A004', nombre:'HUEVO TIPO AAA', stock:0, costo:0, precio:0},
+    {codigo:'A005', nombre:'CANASTA', stock:0, costo:0, precio:0},
+    {codigo:'A0061', nombre:'HUEVO TIPO B 12.000', stock:0, costo:0, precio:12000},
+    {codigo:'A0062', nombre:'HUEVO TIPO B 12.500', stock:0, costo:0, precio:12500},
+    {codigo:'A0063', nombre:'HUEVO TIPO B 11.500', stock:0, costo:0, precio:11500},
+  ],
+  clientes: [
+    {id:1, nombre:'Dana', tienda:'Fruver Mando', tel:'3147215011'},
+    {id:2, nombre:'Santiago', tienda:'Fruver Santiago', tel:'3108997304'},
+    {id:3, nombre:'Edison', tienda:'Merkafacil', tel:'3116836385'},
+    {id:4, nombre:'Pablo Cataño', tienda:'Abarrote Salome', tel:'3124868347'},
+    {id:5, nombre:'Andrea Cataño', tienda:'', tel:'3042421702'},
+    {id:6, nombre:'Barata', tienda:'La Mas Barata', tel:'3215001783'},
+    {id:7, nombre:'Paola', tienda:'Insumos de Panaderia', tel:'3152542595'},
+    {id:8, nombre:'Pindy', tienda:'Panaderia Pindy', tel:'3104411621'},
+    {id:9, nombre:'Salon', tienda:'Tienda Salon', tel:'3016584223'},
+    {id:10, nombre:'Jose Ortiz', tienda:'Tienda Amarilla', tel:'3106028709'},
+    {id:11, nombre:'Ivan', tienda:'Tienda Ivan', tel:''},
+    {id:12, nombre:'Michel', tienda:'Tienda Michel', tel:'3147250038'},
+    {id:13, nombre:'Baticano', tienda:'El Baticano', tel:''},
+    {id:14, nombre:'Maria', tienda:'Tienda Maria', tel:'3103729921'},
+    {id:15, nombre:'Silvia', tienda:'Tienda Solo Dios', tel:'3207696966'},
+    {id:16, nombre:'Enrrique', tienda:'Tienda Ahorro Max', tel:'3137530368'},
+    {id:17, nombre:'Alexis', tienda:'Tienda', tel:'3117498749'},
+  ],
+  proveedores: [
+    {id:'PV001', nombre:'Rogelio', tel:'608098860'},
+    {id:'PV002', nombre:'Martin', tel:'787098708'},
+    {id:'PV003', nombre:'Oscar', tel:'87809089'},
+  ],
+  ventas: [],
+  compras: [],
+};
+
+const STORAGE_KEY = 'huevos-interprice:data';
+const money = n => '$' + Number(n||0).toLocaleString('es-CO');
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+function hasCloudStorage(){
+  return typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
+}
+function loadData(cb){
+  try{
+    if(hasCloudStorage()){
+      window.storage.get(STORAGE_KEY, true).then(res=>{
+        if(res && res.value){
+          try{ cb(JSON.parse(res.value)); return; }catch(e){}
+        }
+        cb(JSON.parse(JSON.stringify(SEED)));
+      }).catch(()=> cb(JSON.parse(JSON.stringify(SEED))));
+      return;
+    }
+    // Fuera de Claude: usar el almacenamiento local del navegador del celular
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      try{ cb(JSON.parse(raw)); return; }catch(e){}
+    }
+    cb(JSON.parse(JSON.stringify(SEED)));
+  }catch(e){
+    cb(JSON.parse(JSON.stringify(SEED)));
+  }
+}
+function saveData(data){
+  try{
+    if(hasCloudStorage()){
+      return window.storage.set(STORAGE_KEY, JSON.stringify(data), true).catch(()=>null);
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return Promise.resolve();
+  }catch(e){
+    return Promise.resolve();
+  }
+}
+
+// ---------- Icons (simple inline SVG) ----------
+const ICONS = {
+  home:'<path d="M3 11l9-8 9 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  box:'<path d="M21 8l-9-5-9 5 9 5 9-5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M3 8v8l9 5 9-5V8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M12 13v8" stroke="currentColor" stroke-width="2"/>',
+  sell:'<path d="M4 4h16l-1.5 9h-13z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="currentColor"/><circle cx="16" cy="19" r="1.4" fill="currentColor"/>',
+  buy:'<path d="M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 9l5 6 5-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 21h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="3.5" cy="6" r="1.3" fill="currentColor"/><circle cx="3.5" cy="12" r="1.3" fill="currentColor"/><circle cx="3.5" cy="18" r="1.3" fill="currentColor"/>',
+};
+function icon(name){ return `<svg viewBox="0 0 24 24">${ICONS[name]}</svg>`; }
+
+// ---------- App state ----------
+let DATA = null;
+let TAB = 'inicio';
+
+function fmtDate(d){
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('es-CO',{day:'2-digit',month:'short'});
+}
+
+function render(){
+  const root = document.getElementById('root');
+  root.innerHTML = `
+    <div class="topbar">
+      <div class="brand">Huevos Interprice<small>SISTEMA DE INVENTARIO</small></div>
+      <div class="clock">${new Date().toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'})}</div>
+    </div>
+    <div class="view" id="view"></div>
+    <div class="navbar">
+      ${navBtn('inicio','home','Inicio')}
+      ${navBtn('inventario','box','Inventario')}
+      ${navBtn('vender','sell','Vender')}
+      ${navBtn('comprar','buy','Comprar')}
+      ${navBtn('movs','list','Historial')}
+    </div>
+  `;
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.onclick = ()=>{ TAB = b.dataset.tab; render(); };
+  });
+  renderView();
+}
+function navBtn(tab,ic,label){
+  return `<button class="nav-btn ${TAB===tab?'active':''}" data-tab="${tab}">${icon(ic)}<span>${label}</span></button>`;
+}
+
+function renderView(){
+  const view = document.getElementById('view');
+  if(TAB==='inicio') return view.innerHTML = viewInicio();
+  if(TAB==='inventario') return view.innerHTML = viewInventario();
+  if(TAB==='vender') { view.innerHTML = viewVender(); wireVender(); return; }
+  if(TAB==='comprar') { view.innerHTML = viewComprar(); wireComprar(); return; }
+  if(TAB==='movs') return view.innerHTML = viewMovs();
+}
+
+function viewInicio(){
+  const valorInv = DATA.productos.reduce((s,p)=>s+p.stock*p.costo,0);
+  const hoy = todayISO();
+  const ventasHoy = DATA.ventas.filter(v=>v.fecha===hoy).reduce((s,v)=>s+v.total,0);
+  const comprasHoy = DATA.compras.filter(c=>c.fecha===hoy).reduce((s,c)=>s+c.total,0);
+  const utilidad = DATA.ventas.reduce((s,v)=>s+(v.total-v.costoTotal),0);
+  const bajos = DATA.productos.filter(p=>p.stock>0 && p.stock<=10);
+  return `
+    <div class="stat-row">
+      <div class="stat-card"><div class="egg"></div><div class="lbl">Inventario</div><div class="val">${money(valorInv)}</div><div class="sub">valor total</div></div>
+      <div class="stat-card"><div class="egg"></div><div class="lbl">Utilidad</div><div class="val">${money(utilidad)}</div><div class="sub">acumulada</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="egg"></div><div class="lbl">Ventas hoy</div><div class="val">${money(ventasHoy)}</div></div>
+      <div class="stat-card"><div class="egg"></div><div class="lbl">Compras hoy</div><div class="val">${money(comprasHoy)}</div></div>
+    </div>
+    <div class="section-title">Stock bajo <span class="tag">${bajos.length}</span></div>
+    ${bajos.length===0 ? `<div class="empty">Todo el stock está en buen nivel.</div>` :
+      bajos.map(p=>`<div class="card prod-row"><div><div class="prod-name">${p.nombre}</div><div class="prod-code">${p.codigo}</div></div><div class="prod-stock"><div class="n low">${p.stock}</div><div class="u">unidades</div></div></div>`).join('')}
+    <div class="section-title">Últimos movimientos</div>
+    ${recentMovs(4)}
+  `;
+}
+
+function recentMovs(n){
+  const all = [
+    ...DATA.ventas.map(v=>({...v,tipo:'venta'})),
+    ...DATA.compras.map(c=>({...c,tipo:'compra'})),
+  ].sort((a,b)=> b.id - a.id).slice(0,n);
+  if(all.length===0) return `<div class="empty">Aún no hay movimientos registrados.</div>`;
+  return `<div class="card">` + all.map(m=>movRow(m)).join('') + `</div>`;
+}
+function movRow(m){
+  const isV = m.tipo==='venta';
+  return `<div class="mov">
+    <div class="mov-left">
+      <div class="mov-badge ${m.tipo}">${isV?'V':'C'}</div>
+      <div><div class="mov-name">${m.nombre}</div><div class="mov-sub">${isV?(m.cliente||'Cliente'):(m.proveedor||'Proveedor')} · ${fmtDate(m.fecha)} · ${m.cantidad} u.</div></div>
+    </div>
+    <div class="mov-val" style="color:${isV?'var(--ok)':'var(--brick)'}">${isV?'+':'-'}${money(m.total)}</div>
+  </div>`;
+}
+
+function viewInventario(){
+  return `
+    <div class="section-title">Productos <span class="tag">${DATA.productos.length}</span></div>
+    ${DATA.productos.map(p=>`
+      <div class="card prod-row">
+        <div><div class="prod-name">${p.nombre}</div><div class="prod-code">${p.codigo} · costo ${money(p.costo)}</div></div>
+        <div class="prod-stock"><div class="n ${p.stock<=10?'low':''}">${p.stock}</div><div class="u">unidades</div></div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function productOptions(){
+  return DATA.productos.map(p=>`<option value="${p.codigo}">${p.nombre} (${p.codigo})</option>`).join('');
+}
+
+function viewVender(){
+  return `
+    <div class="install-banner" id="installTip">
+      📱 <b>Instala esta app:</b> toca el menú del navegador y elige "Agregar a pantalla de inicio" para tenerla como app con ícono propio.
+      <button class="close-x" id="closeTip">✕</button>
+    </div>
+    <div class="section-title">Registrar venta</div>
+    <label>Producto</label>
+    <select id="v-prod">${productOptions()}</select>
+    <label>Cliente</label>
+    <select id="v-cliente">
+      <option value="">Sin cliente (venta directa)</option>
+      ${DATA.clientes.map(c=>`<option value="${c.nombre}">${c.nombre}${c.tienda?' — '+c.tienda:''}</option>`).join('')}
+    </select>
+    <label>Condición</label>
+    <div class="toggle-row">
+      <div class="toggle-opt active" data-val="CONTADO" id="v-contado">Contado</div>
+      <div class="toggle-opt" data-val="CREDITO" id="v-credito">Crédito</div>
+    </div>
+    <label>Cantidad</label>
+    <input type="number" id="v-cant" min="1" value="1" inputmode="numeric">
+    <label>Precio unitario</label>
+    <input type="number" id="v-precio" min="0" inputmode="numeric">
+    <div class="total-box"><div class="t-lbl">TOTAL VENTA</div><div class="t-val" id="v-total">$0</div></div>
+    <button class="btn-main" id="v-submit">Registrar venta</button>
+  `;
+}
+function wireVender(){
+  const prodSel = document.getElementById('v-prod');
+  const precioInp = document.getElementById('v-precio');
+  const cantInp = document.getElementById('v-cant');
+  const totalEl = document.getElementById('v-total');
+  let condicion = 'CONTADO';
+  const tip = localStorage_fake_hide();
+  if(tip) document.getElementById('installTip').classList.add('hide');
+  document.getElementById('closeTip').onclick = ()=>{ document.getElementById('installTip').classList.add('hide'); window.__hideTip = true; };
+  if(window.__hideTip) document.getElementById('installTip').classList.add('hide');
+
+  function syncPrecio(){
+    const p = DATA.productos.find(p=>p.codigo===prodSel.value);
+    precioInp.value = p ? p.precio : 0;
+    updateTotal();
+  }
+  function updateTotal(){
+    totalEl.textContent = money((+cantInp.value||0)*(+precioInp.value||0));
+  }
+  prodSel.onchange = syncPrecio;
+  precioInp.oninput = updateTotal;
+  cantInp.oninput = updateTotal;
+  document.getElementById('v-contado').onclick = ()=>{ condicion='CONTADO'; toggleUI('v-contado','v-credito'); };
+  document.getElementById('v-credito').onclick = ()=>{ condicion='CREDITO'; toggleUI('v-credito','v-contado'); };
+  syncPrecio();
+
+  document.getElementById('v-submit').onclick = ()=>{
+    const p = DATA.productos.find(p=>p.codigo===prodSel.value);
+    const cant = +cantInp.value, precio = +precioInp.value;
+    if(!cant || cant<=0) return alert('Ingresa una cantidad válida.');
+    if(cant > p.stock) return alert(`Stock insuficiente. Disponible: ${p.stock} unidades.`);
+    const total = cant*precio;
+    const costoTotal = cant*p.costo;
+    p.stock -= cant;
+    DATA.ventas.push({
+      id: Date.now(), fecha: todayISO(), codigo:p.codigo, nombre:p.nombre,
+      cantidad:cant, precio, total, costoTotal,
+      cliente: document.getElementById('v-cliente').value, condicion
+    });
+    saveData(DATA).then(()=>{
+      showStamp('VENDIDO', `${cant} × ${p.nombre} · ${money(total)}`);
+      TAB='vender'; render();
+    });
+  };
+}
+function toggleUI(onId,offId){
+  document.getElementById(onId).classList.add('active');
+  document.getElementById(offId).classList.remove('active');
+}
+function localStorage_fake_hide(){ return window.__hideTip; }
+
+function viewComprar(){
+  return `
+    <div class="section-title">Registrar compra</div>
+    <label>Producto</label>
+    <select id="c-prod">${productOptions()}</select>
+    <label>Proveedor</label>
+    <select id="c-prov">
+      <option value="">Sin proveedor</option>
+      ${DATA.proveedores.map(p=>`<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+    </select>
+    <label>Condición</label>
+    <div class="toggle-row">
+      <div class="toggle-opt active" data-val="CONTADO" id="c-contado">Contado</div>
+      <div class="toggle-opt" data-val="CREDITO" id="c-credito">Crédito</div>
+    </div>
+    <label>Cantidad</label>
+    <input type="number" id="c-cant" min="1" value="1" inputmode="numeric">
+    <label>Costo unitario</label>
+    <input type="number" id="c-costo" min="0" inputmode="numeric">
+    <div class="total-box"><div class="t-lbl">TOTAL COMPRA</div><div class="t-val" id="c-total">$0</div></div>
+    <button class="btn-main" id="c-submit">Registrar compra</button>
+  `;
+}
+function wireComprar(){
+  const prodSel = document.getElementById('c-prod');
+  const costoInp = document.getElementById('c-costo');
+  const cantInp = document.getElementById('c-cant');
+  const totalEl = document.getElementById('c-total');
+  let condicion = 'CONTADO';
+  function syncCosto(){
+    const p = DATA.productos.find(p=>p.codigo===prodSel.value);
+    costoInp.value = p ? p.costo : 0;
+    updateTotal();
+  }
+  function updateTotal(){
+    totalEl.textContent = money((+cantInp.value||0)*(+costoInp.value||0));
+  }
+  prodSel.onchange = syncCosto;
+  costoInp.oninput = updateTotal;
+  cantInp.oninput = updateTotal;
+  document.getElementById('c-contado').onclick = ()=>{ condicion='CONTADO'; toggleUI('c-contado','c-credito'); };
+  document.getElementById('c-credito').onclick = ()=>{ condicion='CREDITO'; toggleUI('c-credito','c-contado'); };
+  syncCosto();
+
+  document.getElementById('c-submit').onclick = ()=>{
+    const p = DATA.productos.find(p=>p.codigo===prodSel.value);
+    const cant = +cantInp.value, costo = +costoInp.value;
+    if(!cant || cant<=0) return alert('Ingresa una cantidad válida.');
+    p.stock += cant;
+    p.costo = costo; // actualiza costo de referencia
+    const total = cant*costo;
+    DATA.compras.push({
+      id: Date.now(), fecha: todayISO(), codigo:p.codigo, nombre:p.nombre,
+      cantidad:cant, costo, total,
+      proveedor: document.getElementById('c-prov').value, condicion
+    });
+    saveData(DATA).then(()=>{
+      showStamp('COMPRADO', `${cant} × ${p.nombre} · ${money(total)}`);
+      TAB='comprar'; render();
+    });
+  };
+}
+
+function viewMovs(){
+  const all = [
+    ...DATA.ventas.map(v=>({...v,tipo:'venta'})),
+    ...DATA.compras.map(c=>({...c,tipo:'compra'})),
+  ].sort((a,b)=> b.id - a.id);
+  return `
+    <div class="section-title">Historial completo <span class="tag">${all.length}</span></div>
+    ${all.length===0 ? `<div class="empty">Aún no hay movimientos.</div>` : `<div class="card">${all.map(movRow).join('')}</div>`}
+  `;
+}
+
+function showStamp(text, sub){
+  const ov = document.createElement('div');
+  ov.className = 'stamp-overlay';
+  ov.innerHTML = `<div class="stamp">${text}<div class="sub">${sub}</div></div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=> ov.remove(), 1100);
+}
+
+// ---------- Boot ----------
+try{
+  loadData(data=>{
+    DATA = data;
+    render();
+  });
+}catch(e){
+  DATA = JSON.parse(JSON.stringify(SEED));
+  render();
+}
+window.addEventListener('error', function(){
+  if(!DATA){ DATA = JSON.parse(JSON.stringify(SEED)); render(); }
+});
+</script>
+</body>
+</html>
