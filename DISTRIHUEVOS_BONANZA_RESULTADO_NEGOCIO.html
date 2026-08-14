@@ -1,0 +1,656 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#232b1f"><title>DistriHuevos Bonanza</title>
+<style>
+:root{--bg:#f7f1df;--dark:#232b1f;--olive:#3a4a32;--gold:#e8a33d;--red:#b1472e;--green:#4c7a4c;--ink:#23281f;--muted:#6b6d60;--line:#ddd2ae;--white:#fffdf6}*{box-sizing:border-box}body{margin:0;background:var(--dark);font-family:Arial,sans-serif;color:var(--ink)}button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1180px;margin:auto;background:var(--bg);min-height:100vh}.top{background:var(--dark);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:20}.brand{font-size:21px;font-weight:800}.brand small{display:block;color:var(--gold);font-size:10px;letter-spacing:1.4px;margin-top:3px}.clock{font-size:12px;color:#ddd}.toolbar{padding:10px 14px;background:#fff8e8;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:69px;z-index:19}.btn{border:1px solid var(--olive);background:var(--olive);color:white;border-radius:8px;padding:9px 12px}.btn.alt{background:white;color:var(--olive)}.btn.danger{background:var(--red);border-color:var(--red)}.nav{display:flex;overflow:auto;gap:6px;padding:10px 14px;background:#eee5cc;border-bottom:1px solid var(--line)}.nav button{white-space:nowrap;border:1px solid var(--line);background:#fff8e8;border-radius:999px;padding:8px 11px}.nav button.active{background:var(--olive);color:#fff}.content{padding:16px}.title{font-size:22px;font-weight:800;margin:5px 0 4px}.sub{color:var(--muted);margin-bottom:14px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px}.metric b{display:block;font-size:20px;margin-top:5px}.metric span{font-size:12px;color:var(--muted)}.form{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}.field input,.field select{width:100%;padding:9px;border:1px solid #cfc6a9;border-radius:8px;background:white}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap}.tablewrap{overflow:auto;background:white;border:1px solid var(--line);border-radius:10px}.tbl{border-collapse:collapse;width:100%;min-width:760px}.tbl th,.tbl td{border-bottom:1px solid #eee4ca;padding:8px;text-align:left;font-size:12px;white-space:nowrap}.tbl th{background:#eee5cc;position:sticky;top:0;z-index:1}.empty{padding:25px;text-align:center;color:var(--muted)}.badge{padding:3px 7px;border-radius:99px;font-size:11px;background:#eee}.ok{color:var(--green);font-weight:700}.warn{color:#9b6a00;font-weight:700}.bad{color:var(--red);font-weight:700}.invoice{background:#fff;border:1px solid var(--line);padding:20px;border-radius:12px}.invoice h2{margin:0}.invoicegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:15px;z-index:50}.modal.show{display:flex}.modalbox{background:var(--bg);max-width:850px;width:100%;max-height:92vh;overflow:auto;border-radius:14px;padding:18px}.close{float:right;border:0;background:none;font-size:22px}.toast{position:fixed;right:15px;bottom:15px;background:var(--dark);color:#fff;padding:11px 14px;border-radius:9px;display:none;z-index:100}.toast.show{display:block}.hint{font-size:12px;color:var(--muted)}@media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr 1fr}.top{position:static}.toolbar{position:static}.nav{position:sticky;top:0;z-index:15}}@media(max-width:520px){.cards,.form{grid-template-columns:1fr}.content{padding:10px}.top{padding:13px}.brand{font-size:18px}}
+
+.summary-list{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.summary-list>div{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+.summary-list>div:last-child{border-bottom:0}
+.summary-list span{font-size:14px}
+.summary-list b{font-size:15px}
+.flow-row{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+.flow-row:last-child{border-bottom:0}
+.flow-row small{display:block;opacity:.65;margin-top:3px}
+.flow-values{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.flow-values span{background:rgba(0,0,0,.035);border-radius:10px;padding:8px;font-size:12px}
+.flow-values b{font-size:13px}
+
+</style></head><body><div class="app"><header class="top"><div class="brand">DISTRIHUEVOS BONANZA<small>SISTEMA DE INVENTARIO Y CONTROL</small></div><div class="clock" id="clock"></div></header><div class="toolbar"><button class="btn" onclick="show('menu')">🏠 Menú</button><button class="btn alt" onclick="backup()">💾 Respaldo JSON</button><button class="btn" style="background:#b45309" onclick="resetTestData()">🧹 Nuevo inicio</button><button class="btn alt" onclick="document.getElementById('file').click()">📥 Importar Excel</button><button class="btn" onclick="exportExcel()">📤 Exportar Excel</button><input id="file" type="file" accept=".xlsx,.xlsm" hidden onchange="importExcel(this.files[0])"></div><nav class="nav" id="nav"></nav><main class="content" id="content"></main></div><div class="modal" id="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalbody"></div></div></div><div class="toast" id="toast"></div>
+<script>
+const INITIAL={"MENU": [["MENU", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1008], ["BASE DE DATOS DE PRODUCTOS", null, null, "CLIENTES", null, "FACTURA COMPRA"], ["INVENTARIO", null, null, "FACTURA VENTA", null, "FACTURAS & ABONOS COMPRA"], ["COMPRAS", null, null, "FACTURA & ABONOS VENTA", null, "PROVEEDOR"], ["VENTAS"]], "GASTOS": [["GASTOS"], [null, null, "TOTAL GASTO", "=SUM(Tabla21[VALOR])"], ["TABLA DE GASTOS", null, "CONCEPTO", "FECHA", "VALOR"], ["GASOLONA CARRO"], ["GASOLINA MOTO"], ["DIA EMPLEADO"], ["ALMUERZO"], ["ARRIENDO"]], "FLUJO DE CAJA": [["FLUJO DE CAJA"], ["AÑO", "MES", "MES_TEXTO", "ENTRADAS", "SALIDAS COMPRAS", "SALIDAS GASTOS", "FLUJO NETO", "SALDO ACUMULADO"], [2026, 8, "agosto", 420000, 1870000, 0, -1450000, -1450000]], "BASE DE DATOS DE PRODUCTOS": [["LISTA DE PRODUCTOS"], ["CODIGO", "NOMBRE DEL PRODUCTO", null, "CONDICION"], ["A001", "HUEVO CAMPESINO", null, "CONDICION", "DIAS"], ["A002", "HUEVO TIPO A ", null, "CONTADO", 0], ["A003", "HUEVO TIPO AA", null, "CREDITO", 8], ["A004", "HUEVO TIPO AAA", null, null, 15], ["A005", "CANASTA"], ["A0061", "HUEVO TIPO B 12.000"], ["A0062", "HUEVO TIPO B 12.500"], ["A0063", "HUEVO TIPO B 11.500"]], "INVENTARIO": [["INVENTARIO"], [null, null, null, null, null, null, null, "TOTAL INVENTARIO"], [null, null, null, null, null, null, null, "=SUBTOTAL(9,INVENTARIO[[#All],[VALOR DEL INVENTARIO]])"], ["CODIGO", "NOMBRE DEL PRODUCTO", "COMPRAS", "VENTAS", "STOCK", "COSTO UNITARIO", "VALOR DEL INVENTARIO"], ["A001", "HUEVO CAMPESINO", 50, 30, 20, 11000, 220000], ["A002", "HUEVO TIPO A ", 0, 0, 0, 0, 0], ["A003", "HUEVO TIPO AA", 0, 0, 0, 0, 0], ["A004", "HUEVO TIPO AAA", 0, 0, 0, 0, 0], ["A005", "CANASTA", 0, 0, 0, 0, 0], ["A0061", "HUEVO TIPO B 12.000", 0, 0, 0, 0, 0], ["A0062", "HUEVO TIPO B 12.500", 0, 0, 0, 0, 0], ["A0063", "HUEVO TIPO B 11.500", 0, 0, 0, 0, 0]], "COMPRAS": [["COMPRAS"], [null, null, null, null, null, null, null, "TOTAL"], [null, null, null, null, null, null, null, "=SUBTOTAL(9,COMPRAS[[#All],[TOTAL]])"], ["CODIGO", "FECHA", "MES", "AÑO", "NOMBRE DEL PRODUCTO", "COSTO UNITARIO", "CANTIDAD", "TOTAL"], ["A001", "2026-08-12T00:00:00", "agosto", 2026, "HUEVO CAMPESINO", 11000, 50, 550000]], "VENTAS": [["VENTAS"], [null, null, null, null, null, null, null, null, "TOTAL VENTA", "TOTAL UTILIAD"], [null, null, null, null, null, null, null, null, "=SUBTOTAL(9,VENTAS[[#All],[TOTAL VENTA]])", "=SUBTOTAL(9,VENTAS[[#All],[UTLIDAD]])"], ["CODIGO", "FECHA", "MES", "AÑO", "NOMBRE DEL PRODUCTO", "PRECIO VENTA", "COSTO UNITARIO", "CANTIDAD", "TOTAL VENTA", "UTLIDAD"], ["A001", "2026-08-12T00:00:00", "agosto", 2026, "HUEVO CAMPESINO", 14000, 11000, 30, 420000, 90000]], "CLIENTES": [["CLIENTES"], ["ID_CLIENTE", "CLIENTE", "Cédula/NIT", "Teléfono", "Dirección", "Correo", "tienda"], [1, "dana", null, 3147215011, "belen de bajira", null, "fruver mando"], [2, "santiago", null, 3108997304, "belen de bajira", null, "fruver santiago"], [3, "edison", null, 3116836385, "belen de bajira", null, "merkafacil"], [4, "pablo cataño", null, 3124868347, "belen de bajira", null, "abarrote salome"], [5, "andrea cataño", null, 3042421702, "belen de bajira"], [6, "barata", null, 3215001783, "belen de bajira", null, "la mas barata"], [7, "paola", null, 3152542595, "belen de bajira", null, "insumos de panaderia"], [8, "pindy", null, 3104411621, "belen de bajira", null, "panadaria pindy"], [9, "salon", null, 3016584223, "belen de bajira", null, "tienda salon"], [10, "jose ortiz", null, 3106028709, "belen de bajira", null, "tienda amarilla"], [11, "ivan", null, null, "brisas del rio", null, "tienda ivan"], [12, "michel", null, 3147250038, "brisas del rio", null, "tienda michel"], [13, "baticano", null, null, "casa negra", null, "el baticano"], [14, "maria", null, 3103729921, "no hay como dios", null, "tienda maria"], [15, "silvia", null, 3207696966, "casa negra", null, "tienda solo dios"], [16, "enrrique", null, 3137530368, "no hay como dios", null, " tienda ahorro max"], [17, "alexis", null, 3117498749, "no hay como dios", null, "tienda"], [null, null, null, null, "llano rico", null, "tienda  DyD"]], "FACTURA VENTA": [["#VALUE!", null, "DISTRIHUEVOS BONANZA", null, null, null, "FACTURA DE VENTA"], [null, null, "NIT:", null, null, null, "Factura No.:", 1], [null, null, "Dirección:", "cl29c#110-53", null, null, "Fecha:", "2026-08-12T00:00:00"], [null, null, "Teléfono:", "2325353324r", null, null, "Hora:", "14:59:42"], [null, null, null, null, null, null, "Fecha de vencimiento:", "2026-08-12T00:00:00"], ["INFORMACIÓN DEL CLIENTE"], ["Cliente", "pindy", null, null, "Cédula/NIT"], ["Teléfono", 3104411621, null, null, "Dirección", null, "belen de bajira"], ["Correo"], ["Código", "Producto", "Cantidad", "Precio Unit.", "Descuento", "Total", "INFORMACIÓN DE PAGO", null, "TOTAL PAGO"], ["A001", "HUEVO CAMPESINO", 30, 14000, null, 420000, "Total Factura", null, 420000], [null, null, null, null, null, null, "Pago Contado", null, "=I13"], [null, null, null, null, null, null, "Pago Crédito "], [null, null, null, null, null, null, "Días Crédito", null, 0], ["Observaciones", null, null, null, null, "Entregado por"], ["Firma Cliente"]], "FACTURAS & ABONOS VENTAS": [["FACTURAS VENTAS", null, null, null, null, null, null, null, null, null, null, null, null, "ABONOS"], [null, null, null, null, null, null, null, "TOTAL CARTERA ", "=SUM(FACTURA[SALDO])", "TOTAL CARTERA VENCIDA", "=SUMIF(FACTURA[ESTADO],\"VENCIDA\",FACTURA[SALDO])"], ["ID_CLIENTE", "CLIENTE", "N_FACTURA", "CONDICION", "FECHA _FACTURA", "IMPORTE", "FECHA_VENCIMIENTO", "PAGO", "SALDO", "ESTADO", "DIAS", "RANGO", null, "FECHA", "FACTURA ", "MONTO", null, null, null, null, "CONDICION", null, null, "AGING"], [null, "pindy", 1, "CONTADO", "2026-08-12T00:00:00", 420000, "2026-08-12T00:00:00", 420000, 0, "CANCELADO", "-", null, null, "2026-08-12T00:00:00", 1, 420000, null, null, null, null, "CONDICION", "DIAS", null, "DIAS", "RANGO", "KPI"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "CONTADO", 0, null, -99999, "A VENCER", 0], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "8 DIAS", 8, null, 0, "00-8", 1], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "15 DIAS", 15, null, 9, "00-15", 2]], "FACTURA COMPRA": [["#VALUE!", null, "DISTRIHUEVOS BONANZA", null, null, null, "FACTURA DE COMPRA"], [null, null, "NIT:", null, null, null, "Factura No.:", 1], [null, null, "Dirección:", "cl29c#110-53", null, null, "Fecha:", "2026-08-12T00:00:00"], [null, null, "Teléfono:", "2325353324r", null, null, "Hora:", "14:59:03"], [null, null, null, null, null, null, "Fecha de vencimiento:", "2026-08-12T00:00:00"], ["INFORMACIÓN DEL PROVEEDOR"], ["PROVEEDOR", "MARTIN", null, null, "Cédula/NIT", null, 1020], ["Teléfono", 787098708, null, null, "Dirección", null, 8769768876], ["Correo", "MERTIN20@GMAIL.COM"], ["Código", "Producto", "Cantidad", "Precio Unit.", "Descuento", "Total", "FECHA DE VENCIMIENTO", "INFORMACIÓN DE PAGO", "TOTAL PAGO"], ["A001", "HUEVO CAMPESINO", 50, 11000, null, 550000, "=EDATE(H3,1)", "Total Factura", 550000], [null, null, null, null, null, null, null, "Pago Contado", "=I13"], [null, null, null, null, null, null, null, "Pago Crédito"], [null, null, null, null, null, null, null, "Días Crédito", 0], ["Observaciones", null, null, null, null, "Entregado por"], ["Firma Cliente"]], "LOTES": [["LOTES DE INVENTARIO"], ["N_LOTE", "CODIGO", "NOMBRE DEL PRODUCTO", "N_FACTURA_COMPRA", "FECHA_COMPRA", "CANTIDAD", "FECHA_VENCIMIENTO", "DIAS_PARA_VENCER", "ESTADO", "CANTIDAD_DISPONIBLE"], [2, "A001", "HUEVO CAMPESINO", 1, "2026-08-12T00:00:00", 50, "2026-09-12T00:00:00", 31, "VIGENTE", 20]], "FACTURAS & ABONOS COMPRA": [["FACTURAS COMPRA", null, null, null, null, null, null, null, null, null, null, null, null, "ABONOS"], [null, null, null, null, null, null, null, "TOTAL CARTERA ", "=SUM(FACTURACOMPRA[SALDO])", "TOTAL CARTERA VENCIDA", "=SUMIF(FACTURACOMPRA[ESTADO],\"VENCIDA\",FACTURACOMPRA[SALDO])"], ["ID_PROVEEDOR", "PROVEEDOR", "N_FACTURA", "CONDICION", "FECHA _FACTURA", "IMPORTE", "FECHA_VENCIMIENTO", "PAGO", "SALDO", "ESTADO", "DIAS", "RANGO", null, "FECHA", "FACTURA", "MONTO", null, null, null, null, "CONDICION", null, null, "AGING"], [null, null, null, null, null, null, null, null, null, null, null, null, null, "2026-08-11T00:00:00", 4, 440000, null, null, null, null, "CONDICION", "DIAS", null, "DIAS", "RANGO", "KPI"], [null, null, null, null, null, null, null, null, null, null, null, null, null, "2026-08-12T00:00:00", 5, 440000, null, null, null, null, "CONTADO", 0, null, -99999, "A VENCER", 0], [null, "MARTIN", 1, "CONTADO", "2026-08-12T00:00:00", 550000, "2026-08-12T00:00:00", 550000, 0, "CANCELADO", "-", null, null, "2026-08-12T00:00:00", 5, 440000, null, null, null, null, "8 DIAS", 8, null, 0, "00-8", 1], [null, null, null, null, null, null, null, null, null, null, null, null, null, "2026-08-12T00:00:00", 1, 550000, null, null, null, null, "15 DIAS", 15, null, 9, "00-15", 2]], "PROVEEDORES": [["proveedores"], ["ID_PROVEEDOR", "PROVEEDOR", "Cédula/NIT", "Teléfono", "Dirección", "Correo"], ["PV001", "ROGELIO", 1030, 608098860, 87956978518, "ESTEBAN30@GMAIL.COM"], ["PV002", "MARTIN", 1020, 787098708, 8769768876, "MERTIN20@GMAIL.COM"], ["PV003", "OSCAR", 1012, 87809089, 9890889807, "OSCAR34@GMAIL.COM"]]};
+const KEY='DISTRIHUEVOS BONANZA_EXACT_2026';
+let DB=JSON.parse(localStorage.getItem(KEY)||'null')||structuredClone(INITIAL);
+
+// Relaciona cada línea de COMPRAS/VENTAS con su N° de factura sin alterar
+// las columnas originales del Excel: el N° de factura se guarda como última columna.
+function ensureInvoiceLinks(){
+  for(const sheet of ['COMPRAS','VENTAS']){
+    const rs=DB[sheet]||[];
+    if(!rs.length) continue;
+    const header=rs.find(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()===sheet);
+    // En estas hojas el encabezado real es la fila que contiene CODIGO.
+    const hi=rs.findIndex(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()==='CODIGO');
+    if(hi<0) continue;
+    if(String(rs[hi][rs[hi].length-1]??'').toUpperCase()!=='N_FACTURA') rs[hi].push('N_FACTURA');
+    const portfolio=sheet==='VENTAS'?(DB['FACTURAS & ABONOS VENTAS']||[]):(DB['FACTURAS & ABONOS COMPRA']||[]);
+    const used=new Set();
+    for(let i=hi+1;i<rs.length;i++){
+      const row=rs[i]; if(!row||!row[0]) continue;
+      if(row.length<rs[hi].length) row.push('');
+      if(row[rs[hi].length-1]) continue;
+      const fecha=String(row[1]??'').slice(0,10);
+      const total=num(sheet==='VENTAS'?row[8]:row[7]);
+      let match=-1;
+      for(let j=1;j<portfolio.length;j++){
+        const pr=portfolio[j];
+        const pf=String(pr?.[4]??'').slice(0,10), pi=num(pr?.[2]), pt=num(pr?.[5]);
+        if(!used.has(pi) && pf===fecha && pt===total){match=j;break;}
+      }
+      if(match<0){
+        const nums=portfolio.slice(1).map(r=>num(r?.[2])).filter(Boolean);
+        const fallback=nums[i-hi-1];
+        if(fallback) row[rs[hi].length-1]=fallback;
+      } else { row[rs[hi].length-1]=portfolio[match][2]; used.add(num(portfolio[match][2])); }
+    }
+  }
+}
+ensureInvoiceLinks();
+
+// Sincronización central: COMPRAS y VENTAS son las fuentes de movimiento del inventario.
+function normalizeInventory(){
+  const header=['CODIGO','NOMBRE DEL PRODUCTO','COMPRAS','VENTAS','STOCK','COSTO UNITARIO','VALOR DEL INVENTARIO'];
+  const products=(DB['BASE DE DATOS DE PRODUCTOS']||[]).slice(2).filter(r=>r&&r[0]);
+  const purchaseRows=(DB['COMPRAS']||[]).slice(4).filter(r=>r&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO');
+  const saleRows=(DB['VENTAS']||[]).slice(4).filter(r=>r&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO');
+  const old=(DB['INVENTARIO']||[]).filter(r=>r&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO');
+  const oldMap=new Map(old.map(r=>[String(r[0]),r]));
+  const out=[['INVENTARIO'],[null,null,null,null,null,null,null,'TOTAL INVENTARIO'],[null,null,null,null,null,null,null,null],header];
+  products.forEach(pr=>{
+    const code=String(pr[0]),name=String(pr[1]||'');
+    const qCompra=purchaseRows.filter(r=>String(r[0])===code).reduce((a,r)=>a+num(r[6]),0);
+    const qVenta=saleRows.filter(r=>String(r[0])===code).reduce((a,r)=>a+num(r[7]),0);
+    const oldr=oldMap.get(code);
+    let cost=0;
+    const last=purchaseRows.filter(r=>String(r[0])===code).at(-1);
+    if(last) cost=num(last[5]); else if(oldr) cost=num(oldr[5]);
+    const compras=qCompra; const ventas=qVenta; const stock=compras-ventas;
+    out.push([code,name,compras,ventas,stock,cost,stock*cost]);
+  });
+  DB['INVENTARIO']=out;
+}
+normalizeInventory();
+save();
+const sheets=['MENU','GASTOS','FLUJO DE CAJA','BASE DE DATOS DE PRODUCTOS','INVENTARIO','COMPRAS','VENTAS','CLIENTES','FACTURA VENTA','FACTURAS & ABONOS VENTAS','FACTURA COMPRA','LOTES','FACTURAS & ABONOS COMPRA','PROVEEDORES'];
+const navMap={menu:'MENU',gastos:'GASTOS',flujo:'FLUJO DE CAJA',productos:'BASE DE DATOS DE PRODUCTOS',inventario:'INVENTARIO',compras:'COMPRAS',ventas:'VENTAS',clientes:'CLIENTES',facturaventa:'FACTURA VENTA',carteraventa:'FACTURAS & ABONOS VENTAS',facturacompra:'FACTURA COMPRA',lotes:'LOTES',carteracompra:'FACTURAS & ABONOS COMPRA',proveedores:'PROVEEDORES'};
+function save(){localStorage.setItem(KEY,JSON.stringify(DB));}
+function toast(s){let e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function money(v){return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(v)||0)}
+function num(v){return Number(String(v??'').replace(/[^0-9.-]/g,''))||0}
+function date(v){if(!v)return '';let d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString('es-CO')}
+function iso(d){return new Date(d).toISOString().slice(0,10)}
+function headers(rows){return rows[0]||[]}
+function rows(name){return DB[name]||[]}
+function table(name,limit=500){let rs=rows(name); if(!rs.length)return '<div class="empty">Sin registros.</div>';let h=headers(rs);return `<div class="tablewrap"><table class="tbl"><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${rs.slice(1,limit+1).map((r,i)=>`<tr>${h.map((_,j)=>`<td>${esc(r[j]??'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function setNav(active){document.getElementById('nav').innerHTML=Object.entries(navMap).map(([k,v])=>`<button class="${active===k?'active':''}" onclick="show('${k}')">${icon(k)} ${v}</button>`).join('')}
+function icon(k){return {menu:'🏠',gastos:'💸',flujo:'💰',productos:'🥚',inventario:'📦',compras:'🛒',ventas:'💵',clientes:'👥',facturaventa:'🧾',carteraventa:'📒',facturacompra:'🧾',lotes:'📅',carteracompra:'📒',proveedores:'🚚'}[k]||'•'}
+function show(k){setNav(k);let c=document.getElementById('content'); if(k==='menu')return renderMenu(c); if(k==='productos')return renderProducts(c);if(k==='clientes')return renderPeople(c,'CLIENTES');if(k==='proveedores')return renderPeople(c,'PROVEEDORES');if(k==='inventario')return renderInventory(c);if(k==='compras')return renderPurchase(c);if(k==='ventas')return renderSale(c);if(k==='gastos')return renderExpense(c);if(k==='flujo')return renderFlow(c);if(k==='lotes')return renderLots(c);if(k==='facturaventa')return renderInvoice(c,'venta');if(k==='facturacompra')return renderInvoice(c,'compra');if(k==='carteraventa')return renderPortfolio(c,'venta');if(k==='carteracompra')return renderPortfolio(c,'compra');c.innerHTML=`<div class="title">${esc(navMap[k])}</div><div class="sub">Vista fiel de la hoja del Excel.</div>${table(navMap[k])}`}
+function renderMenu(c){let inv=calcInv(),sales=calcSales(),purchases=calcPurchases(),cv=calcPortfolio('venta'),cc=calcPortfolio('compra');c.innerHTML=`<div class="title">MENU</div><div class="sub">Panel principal basado en las hojas del libro DISTRIHUEVOS BONANZA.</div><div class="cards"><div class="card metric"><span>Inventario</span><b>${money(inv.value)}</b></div><div class="card metric"><span>Ventas</span><b>${money(sales.total)}</b></div><div class="card metric"><span>Compras</span><b>${money(purchases.total)}</b></div><div class="card metric"><span>Cartera ventas</span><b>${money(cv.balance)}</b></div></div><div class="card" style="margin-top:12px"><h3>Hojas del Excel</h3><div class="actions">${Object.entries(navMap).filter(([k])=>k!=='menu').map(([k,v])=>`<button class="btn alt" onclick="show('${k}')">${icon(k)} ${v}</button>`).join('')}</div><p class="hint">La aplicación usa la misma estructura de hojas, nombres de campos y reglas de contado/crédito del archivo suministrado.</p></div>`}
+function calcInv(){let h=headers(rows('INVENTARIO')),rs=rows('INVENTARIO').slice(1);let value=rs.reduce((s,r)=>s+num(r[6]),0);return {value,rows:rs}}
+function calcSales(){let rs=rows('VENTAS').slice(1);return {total:rs.reduce((s,r)=>s+num(r[8]),0),profit:rs.reduce((s,r)=>s+num(r[9]),0)}}
+function calcPurchases(){let rs=rows('COMPRAS').slice(1);return {total:rs.reduce((s,r)=>s+num(r[7]),0)}}
+function renderProducts(c){let rs=rows('BASE DE DATOS DE PRODUCTOS');c.innerHTML=`<div class="title">LISTA DE PRODUCTOS</div><div class="sub">Misma tabla del Excel.</div>${table('BASE DE DATOS DE PRODUCTOS')}<div class="card"><h3>Nuevo producto</h3><form class="form" onsubmit="addProduct(event)"><div class="field"><label>Código</label><input id="pc" required></div><div class="field"><label>Nombre</label><input id="pn" required></div><div class="field"><label>Condición</label><select id="pcond"><option>CONTADO</option><option>CREDITO</option></select></div><div class="field"><label>Días</label><select id="pd"><option value="0">0</option><option value="8">8</option><option value="15">15</option></select></div><div class="full actions"><button class="btn">Guardar producto</button></div></form></div>`}
+function addProduct(e){e.preventDefault();DB['BASE DE DATOS DE PRODUCTOS'].push([pc.value,pn.value,null,'CONDICION',Number(pd.value)]);save();toast('Producto guardado');show('productos')}
+function renderPeople(c,name){let isC=name==='CLIENTES';let rs=rows(name);c.innerHTML=`<div class="title">${name}</div><div class="sub">Estructura tomada directamente del Excel.</div>${table(name)}<div class="card"><h3>Nuevo ${isC?'cliente':'proveedor'}</h3><form class="form" onsubmit="addPerson(event,'${name}')"><div class="field"><label>ID</label><input id="idp" required></div><div class="field"><label>${isC?'Cliente':'Proveedor'}</label><input id="nomp" required></div><div class="field"><label>Cédula/NIT</label><input id="nitp"></div><div class="field"><label>Teléfono</label><input id="telp"></div><div class="field"><label>Dirección</label><input id="dirp"></div><div class="field"><label>Correo</label><input id="corp"></div>${isC?'<div class="field"><label>Tienda</label><input id="tiendap"></div>':''}<div class="full actions"><button class="btn">Guardar</button></div></form></div>`}
+function addPerson(e,name){e.preventDefault();let isC=name==='CLIENTES';let r=isC?[idp.value,nomp.value,nitp.value,telp.value,dirp.value,corp.value,tiendap.value]:[idp.value,nomp.value,nitp.value,telp.value,dirp.value,corp.value];DB[name].push(r);save();toast('Guardado');show(isC?'clientes':'proveedores')}
+function productList(){return rows('INVENTARIO').slice(1).filter(r=>r[0]).map(r=>({code:r[0],name:r[1],stock:num(r[4]),cost:num(r[5])}))}
+function renderInventory(c){
+  const rs=DB['INVENTARIO']||[];
+  const hi=rs.findIndex(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()==='CODIGO'); const data=hi>=0?rs.slice(hi+1).filter(r=>r&&r[0]):[];
+  const total=data.reduce((s,r)=>s+num(r[6]),0);
+  c.innerHTML=`<div class="title">INVENTARIO</div><div class="sub">Compras, ventas, stock, costo unitario y valor del inventario.</div><div class="cards"><div class="card metric"><span>Total inventario</span><b>${money(total)}</b></div><div class="card metric"><span>Productos</span><b>${data.length}</b></div></div><div class="tablewrap" style="margin-top:12px"><table class="tbl"><thead><tr>${['CODIGO','NOMBRE DEL PRODUCTO','COMPRAS','VENTAS','STOCK','COSTO UNITARIO','VALOR DEL INVENTARIO'].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${data.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${num(r[2])}</td><td>${num(r[3])}</td><td><b>${num(r[4])}</b></td><td>${money(r[5])}</td><td>${money(r[6])}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function productOpts(){return productList().map(p=>`<option value="${esc(p.code)}">${esc(p.name)} (${esc(p.code)})</option>`).join('')}
+function clientOpts(){return rows('CLIENTES').slice(2).filter(r=>r[1]).map(r=>`<option value="${esc(r[1])}">${esc(r[1])}${r[6]?' — '+esc(r[6]):''}</option>`).join('')}
+function providerOpts(){return rows('PROVEEDORES').slice(2).filter(r=>r[1]).map(r=>`<option value="${esc(r[1])}">${esc(r[1])}</option>`).join('')}
+function creditSelect(id){return `<select id="${id}"><option value="0">CONTADO — 0 días</option><option value="8">8 DIAS</option><option value="15">15 DIAS</option></select>`}
+let saleCart=[],purchaseCart=[];
+function renderSale(c){let inv=nextInvoice('venta');c.innerHTML=`<div class="title">VENTAS / FACTURA DE VENTA</div><div class="sub">Una venta puede contener varios productos. Condiciones permitidas: contado, 8 o 15 días.</div><div class="card"><div class="form"><div class="field"><label>N° factura</label><input id="sinv" type="number" min="1" step="1" value="${inv}"></div><div class="field"><label>Cliente</label><select id="sclient"><option value="">Venta directa</option>${clientOpts()}</select></div><div class="field"><label>Condición</label>${creditSelect('scond')}</div><div class="field"><label>Fecha</label><input id="sdate" type="date" value="${iso(new Date())}"></div><div class="field"><label>Fecha de vencimiento</label><input id="screditvenc" type="text" readonly></div><div class="field"><label>Descuento</label><input id="sdisc" type="number" value="0" min="0"></div><div class="field"><label>Producto</label><select id="sprod">${productOpts()}</select></div><div class="field"><label>Cantidad</label><input id="sqty" type="number" min="1" value="1"></div><div class="field"><label>Precio unitario</label><input id="sprice" type="number" min="0"></div><div class="field actions" style="align-items:end"><button class="btn" type="button" onclick="addSaleItem()">+ Agregar producto</button></div></div><div id="salecart"></div><div class="actions"><button class="btn" onclick="saveSale()">Registrar venta N° ${inv}</button><button class="btn alt" onclick="saleCart=[];drawSaleCart()">Limpiar</button></div></div><div class="card" style="margin-top:14px"><h3>Últimas ventas</h3>${salesHistoryTable()}</div>`;document.getElementById('sinv').oninput=()=>{let n=num(document.getElementById('sinv').value);document.querySelectorAll('#ventas .actions .btn')[0]?.replaceChildren(document.createTextNode('Registrar venta N° '+(n||'')))};const refreshSaleVenc=()=>{let d=new Date(document.getElementById('sdate').value+'T12:00:00');let cond=num(document.getElementById('scond').value);let venc=new Date(d);venc.setDate(venc.getDate()+cond);document.getElementById('screditvenc').value=date(venc)};document.getElementById('sdate').onchange=refreshSaleVenc;document.getElementById('scond').onchange=refreshSaleVenc;document.getElementById('sprod').onchange=()=>{let p=productList().find(x=>x.code===sprod.value);sprice.value=p?p.cost:0};document.getElementById('sprod').dispatchEvent(new Event('change'));refreshSaleVenc();drawSaleCart()}
+function addSaleItem(){let p=productList().find(x=>x.code===sprod.value),q=num(sqty.value),price=num(sprice.value);if(!p||q<1)return toast('Seleccione producto y cantidad');let used=saleCart.filter(x=>x.code===p.code).reduce((s,x)=>s+x.qty,0);if(q+used>p.stock)return toast('Stock insuficiente');saleCart.push({code:p.code,name:p.name,qty:q,price,total:q*price});drawSaleCart()}
+function drawSaleCart(){let el=document.getElementById('salecart');if(!el)return;let total=saleCart.reduce((s,x)=>s+x.total,0);el.innerHTML=`<h3>Detalle de venta</h3>${saleCart.length?`<div class="tablewrap"><table class="tbl"><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Total</th><th></th></tr>${saleCart.map((x,i)=>`<tr><td>${esc(x.code)}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${money(x.price)}</td><td>${money(x.total)}</td><td><button class="btn danger" onclick="saleCart.splice(${i},1);drawSaleCart()">Eliminar</button></td></tr>`).join('')}</table></div>`:'<div class="empty">No hay productos agregados.</div>'}<div class="card" style="margin-top:10px"><b>Total venta: ${money(total)}</b></div>`}
+function saveSale(){
+  if(!saleCart.length)return toast('Agregue productos');
+  let cond=num(scond.value),d=new Date(sdate.value+'T12:00:00'),client=sclient.value||'',invoice=num(document.getElementById('sinv').value);
+  if(!Number.isInteger(invoice)||invoice<1)return toast('Ingresa un N° de factura válido.');
+  if(rows('FACTURAS & ABONOS VENTAS').slice(1).some(r=>num(r[2])===invoice))return toast('Ese N° de factura ya existe en ventas. Usa otro número.');
+  normalizeInventory();
+  for(const x of saleCart){
+    const inv=productList().find(p=>p.code===x.code);
+    if(!inv || num(x.qty)>num(inv.stock)) return toast(`Stock insuficiente para ${x.name}. Disponible: ${inv?inv.stock:0} unidades.`);
+    const lotes=(DB['LOTES']||[]).slice(1).filter(r=>String(r[1]??'')===String(x.code) && num(r[9])>0);
+    const lotStock=lotes.reduce((a,r)=>a+num(r[9]),0);
+    if(lotStock<num(x.qty)) return toast(`No hay suficientes unidades en lotes para ${x.name}. Disponibles en lotes: ${lotStock}.`);
+  }
+  let total=saleCart.reduce((s,x)=>s+x.total,0)-num(sdisc.value);if(total<0)total=0;
+  let ws=DB['VENTAS'];
+  saleCart.forEach(x=>{let prod=productList().find(p=>p.code===x.code);let costo=prod?num(prod.cost):0;ws.push([x.code,iso(d),d.toLocaleString('es-CO',{month:'long'}),d.getFullYear(),x.name,x.price,costo,x.qty,x.total,x.qty*(x.price-costo),invoice]);});
+  let cv=DB['FACTURAS & ABONOS VENTAS'];let id=rows('CLIENTES').find(r=>r[1]===client)?.[0]||'';let venc=new Date(d);venc.setDate(venc.getDate()+cond);let pago=cond===0?total:0;
+  cv.push([id,client,invoice,cond===0?'CONTADO':`${cond} DIAS`,iso(d),total,iso(venc),pago,total-pago,total-pago===0?'CANCELADO':(new Date()>venc?'VENCIDA':'PENDIENTE'),cond===0?'-':cond,'']);
+  updateInvoiceSheet('venta',invoice,d,venc,client,total,cond,saleCart);
+  const result=updateInventoryAfterSale(saleCart);
+  if(!result.ok){
+    ws.splice(ws.length-saleCart.length,saleCart.length);
+    cv.pop();
+    return toast(`No se pudo descontar el lote de ${result.code}.`);
+  }
+  rebuildCashFlow(); save();saleCart=[];toast(`Venta registrada — Factura N° ${invoice}`);show('ventas')
+}
+function consumeLotsForSale(items){
+  const lotes=DB['LOTES']||[];
+  for(const item of items){
+    let restante=num(item.qty);
+    const candidatos=lotes.slice(1).filter(r=>String(r[1]??'')===String(item.code) && num(r[9])>0)
+      .sort((a,b)=>new Date(a[4])-new Date(b[4]));
+    for(const r of candidatos){
+      if(restante<=0) break;
+      const saldo=num(r[9]);
+      const usar=Math.min(restante,saldo);
+      r[9]=saldo-usar;
+      restante-=usar;
+    }
+    if(restante>0) return {ok:false,code:item.code,missing:restante};
+  }
+  for(let i=1;i<lotes.length;i++){
+    const r=lotes[i];
+    if(!r) continue;
+    const saldo=num(r[9]);
+    const venc=new Date(r[6]);
+    r[8]=saldo<=0?'AGOTADO':(venc<new Date()?'VENCIDO':(Math.ceil((venc-new Date())/86400000)<=7?'POR VENCER':'VIGENTE'));
+    r[7]=isNaN(venc)?r[7]:Math.ceil((venc-new Date())/86400000);
+  }
+  return {ok:true};
+}
+function updateInventoryAfterSale(items){
+  normalizeInventory();
+  const result=consumeLotsForSale(items);
+  if(!result.ok) return result;
+  normalizeInventory();
+  save();
+  return result;
+}
+function nextInvoice(t){let arr=rows(t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA').slice(1);return arr.reduce((m,r)=>Math.max(m,num(r[2])),0)+1}
+function renderPurchase(c){let inv=nextInvoice('compra');c.innerHTML=`<div class="title">COMPRAS / FACTURA DE COMPRA</div><div class="sub">Compra de productos, proveedor, lote y vencimiento de un mes. Condiciones: contado, 8 o 15 días.</div><div class="card"><div class="form"><div class="field"><label>N° factura</label><input id="pinv" type="number" min="1" step="1" value="${inv}"></div><div class="field"><label>Proveedor</label><select id="pven">${providerOpts()}</select></div><div class="field"><label>Condición</label>${creditSelect('pcond2')}</div><div class="field"><label>Fecha factura</label><input id="pdate" type="date" value="${iso(new Date())}"></div><div class="field"><label>Vencimiento crédito</label><input id="pcreditvenc" type="text" readonly></div><div class="field"><label>Producto</label><select id="pprod">${productOpts()}</select></div><div class="field"><label>Cantidad</label><input id="pqty" type="number" min="1" value="1"></div><div class="field"><label>Costo unitario</label><input id="pcost" type="number" min="0"></div><div class="field"><label>Vencimiento del lote</label><input id="plotvenc" type="text" readonly></div><div class="field actions" style="align-items:end"><button class="btn" onclick="addPurchaseItem()" type="button">+ Agregar producto</button></div></div><div id="purchasecart"></div><div class="actions"><button class="btn" onclick="savePurchase()">Registrar compra N° ${inv}</button><button class="btn alt" onclick="purchaseCart=[];drawPurchaseCart()">Limpiar</button></div></div>`;const refreshPurchaseDates=()=>{let d=new Date(document.getElementById('pdate').value+'T12:00:00');let cond=num(document.getElementById('pcond2').value);let cv=new Date(d);cv.setDate(cv.getDate()+cond);document.getElementById('pcreditvenc').value=date(cv);let lv=new Date(d);lv.setMonth(lv.getMonth()+1);document.getElementById('plotvenc').value=date(lv);drawPurchaseCart()};document.getElementById('pinv').oninput=()=>{let n=num(document.getElementById('pinv').value);document.querySelectorAll('#compras .actions .btn')[0]?.replaceChildren(document.createTextNode('Registrar compra N° '+(n||'')))};document.getElementById('pdate').onchange=refreshPurchaseDates;document.getElementById('pcond2').onchange=refreshPurchaseDates;document.getElementById('pprod').onchange=()=>{let p=productList().find(x=>x.code===pprod.value);pcost.value=p?p.cost:0;refreshPurchaseDates()};pprod.dispatchEvent(new Event('change'));refreshPurchaseDates()}
+function addPurchaseItem(){let p=productList().find(x=>x.code===pprod.value),q=num(pqty.value),cost=num(pcost.value);if(!p||q<1)return toast('Seleccione producto y cantidad');purchaseCart.push({code:p.code,name:p.name,qty:q,cost,total:q*cost});drawPurchaseCart()}
+function drawPurchaseCart(){let el=document.getElementById('purchasecart');if(!el)return;let total=purchaseCart.reduce((s,x)=>s+x.total,0);let lv=new Date(document.getElementById('pdate').value+'T12:00:00');lv.setMonth(lv.getMonth()+1);let loteVenc=date(lv);el.innerHTML=`<h3>Detalle de compra</h3>${purchaseCart.length?`<div class="tablewrap"><table class="tbl"><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Costo</th><th>Vencimiento lote</th><th>Total</th><th></th></tr>${purchaseCart.map((x,i)=>`<tr><td>${esc(x.code)}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${money(x.cost)}</td><td><b>${loteVenc}</b></td><td>${money(x.total)}</td><td><button class="btn danger" onclick="purchaseCart.splice(${i},1);drawPurchaseCart()">Eliminar</button></td></tr>`).join('')}</table></div>`:'<div class="empty">No hay productos agregados.</div>'}<div class="card" style="margin-top:10px"><b>Total compra: ${money(total)}</b><br><span>Vencimiento del lote: <b>${loteVenc}</b></span></div>`}
+function purchasePortfolioHeaderIndex(){
+  const rs=DB['FACTURAS & ABONOS COMPRA']||[];
+  return rs.findIndex(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim().toUpperCase()==='N_FACTURA'));
+}
+function purchasePortfolioFind(invoice){
+  const rs=DB['FACTURAS & ABONOS COMPRA']||[];
+  return rs.findIndex((r,i)=>i>purchasePortfolioHeaderIndex() && num(r?.[2])===num(invoice));
+}
+function upsertPurchasePortfolio({id,prov,invoice,cond,d,total,venc}){
+  const name='FACTURAS & ABONOS COMPRA';
+  if(!DB[name]) DB[name]=[];
+  const rs=DB[name];
+  const header=purchasePortfolioHeaderIndex();
+  const row=[id,prov,invoice,cond===0?'CONTADO':`${cond} DIAS`,iso(d),total,iso(venc),cond===0?total:0,cond===0?0:total,cond===0?'CANCELADO':(new Date()>venc?'VENCIDA':'PENDIENTE'),cond===0?'-':cond,''];
+  const existing=purchasePortfolioFind(invoice);
+  if(existing>=0) rs[existing]=row;
+  else rs.splice(header>=0?header+1:rs.length,0,row);
+}
+function savePurchase(){
+  if(!purchaseCart.length)return toast('Agregue productos');
+  const cond=num(pcond2.value),d=new Date(pdate.value+'T12:00:00'),prov=pven.value;
+  const total=purchaseCart.reduce((s,x)=>s+x.total,0);
+  const venc=new Date(d);venc.setDate(venc.getDate()+cond);
+  const invoice=num(document.getElementById('pinv').value);
+  if(!Number.isInteger(invoice)||invoice<1)return toast('Ingresa un N° de factura válido.');
+  if(purchasePortfolioFind(invoice)>=0)return toast('Ese N° de factura ya existe en compras. Usa otro número.');
+
+  // 1. Guardar cada línea en COMPRAS.
+  const ws=DB['COMPRAS'];
+  purchaseCart.forEach(x=>ws.push([x.code,iso(d),d.toLocaleString('es-CO',{month:'long'}),d.getFullYear(),x.name,x.cost,x.qty,x.total,invoice]));
+
+  // 2. Crear UNA factura en FACTURAS & ABONOS COMPRA.
+  const id=rows('PROVEEDORES').find(r=>String(r[1]??'').trim().toUpperCase()===String(prov??'').trim().toUpperCase())?.[0]||'';
+  upsertPurchasePortfolio({id,prov,invoice,cond,d,total,venc});
+
+  // 3. Actualizar FACTURA COMPRA con el mismo N° y todos sus productos.
+  updateInvoiceSheet('compra',invoice,d,venc,prov,total,cond,purchaseCart);
+
+  // 4. Crear los lotes vinculados a la factura.
+  const lot=DB['LOTES'];
+  purchaseCart.forEach(x=>{
+    let v=new Date(d); v.setMonth(v.getMonth()+1);
+    let n=lot.slice(1).reduce((m,r)=>Math.max(m,num(r[0])),0)+1;
+    lot.push([n,x.code,x.name,invoice,iso(d),x.qty,iso(v),Math.ceil((v-d)/86400000),'VIGENTE',x.qty]);
+  });
+
+  // 5. RECONSTRUIR INVENTARIO desde COMPRAS y VENTAS.
+  normalizeInventory();
+  rebuildCashFlow();
+  save();
+  purchaseCart=[];
+  toast('Compra registrada en COMPRAS + INVENTARIO + LOTES + FACTURA COMPRA + CARTERA');
+  show('compras');
+}
+function expenseRows(){
+  const rs=rows('GASTOS')||[];
+  // Formato actual: [CONCEPTO, FECHA, VALOR]
+  if(rs.length && String(rs[0]?.[0]??'').toUpperCase()==='CONCEPTO'){
+    return rs.slice(1).filter(r=>r&&String(r[0]??'').trim());
+  }
+  // Compatibilidad con la estructura antigua del Excel:
+  // fila 3 contiene CONCEPTO/FECHA/VALOR y los conceptos de catálogo vienen después.
+  return rs.slice(3).filter(r=>r&&String(r[2]??'').trim()).map(r=>[r[2],r[3],r[4]]);
+}
+function renderExpense(c){
+  const base=rows('GASTOS').slice(3).map(r=>String(r?.[0]??'').trim()).filter(Boolean);
+  const opts=[...new Set(base)].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  const data=expenseRows();
+  const expenseTable=`<div class="tablewrap"><table class="tbl"><thead><tr><th>CONCEPTO</th><th>FECHA</th><th>VALOR</th></tr></thead><tbody>${
+    data.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${money(num(r[2]))}</td></tr>`).join('')
+  }</tbody></table></div>`;
+  c.innerHTML=`<div class="title">GASTOS</div><div class="sub">Tabla de gastos del Excel.</div>${expenseTable}<div class="card"><h3>Registrar gasto</h3><form class="form" onsubmit="addExpense(event)"><div class="field"><label>Concepto</label><select id="gcon" required><option value="">Selecciona un gasto</option>${opts}<option value="__OTRO__">OTRO</option></select></div><div class="field hide" id="gconOtherWrap"><label>Otro concepto</label><input id="gconOther" placeholder="Escribe el concepto"></div><div class="field"><label>Fecha</label><input id="gdate" type="date" value="${iso(new Date())}" required></div><div class="field"><label>Valor del gasto</label><input id="gval" type="number" min="0.01" step="0.01" required inputmode="decimal" placeholder="0"></div><div class="actions"><button class="btn">Guardar gasto</button></div></form></div>`;
+  const sel=document.getElementById('gcon'),wrap=document.getElementById('gconOtherWrap');
+  sel.onchange=()=>{wrap.classList.toggle('hide',sel.value!=='__OTRO__');if(sel.value!=='__OTRO__')document.getElementById('gconOther').value='';};
+}
+function addExpense(e){
+  e.preventDefault();
+  const sel=document.getElementById('gcon');
+  const concept=sel.value==='__OTRO__'?String(document.getElementById('gconOther').value||'').trim():String(sel.value||'').trim();
+  const fecha=document.getElementById('gdate').value;
+  const valor=num(document.getElementById('gval').value);
+  if(!concept)return alert('Selecciona el concepto del gasto.');
+  if(!fecha)return alert('Selecciona la fecha del gasto.');
+  if(valor<=0)return alert('Ingresa un valor de gasto mayor que 0.');
+
+  // Normalizamos GASTOS a una tabla real: CONCEPTO | FECHA | VALOR.
+  const existing=expenseRows();
+  DB['GASTOS']=[['CONCEPTO','FECHA','VALOR'],...existing,[concept,fecha,valor]];
+
+  rebuildCashFlow();
+  save();
+  toast(`Gasto registrado: ${money(valor)}`);
+  show('gastos');
+}
+function rebuildCashFlow(){
+  const months=new Map();
+
+  function ensureMonth(value){
+    if(!value)return null;
+    const raw=String(value).slice(0,10);
+    const dt=new Date(raw+'T00:00:00');
+    if(isNaN(dt))return null;
+    const y=dt.getFullYear(),m=dt.getMonth()+1,key=`${y}-${String(m).padStart(2,'0')}`;
+    if(!months.has(key))months.set(key,{y,m,text:dt.toLocaleString('es-CO',{month:'long'}),in:0,pc:0,g:0});
+    return months.get(key);
+  }
+
+  // GASTOS
+  expenseRows().forEach(r=>{
+    const x=ensureMonth(r[1]),v=num(r[2]);
+    if(x&&v>0)x.g+=v;
+  });
+
+  // FACTURAS DE VENTA: solo CONTADO entra inmediatamente a caja.
+  // Las ventas a crédito entran a caja únicamente mediante ABONOS.
+  const fv=DB['FACTURAS & ABONOS VENTAS']||[];
+  const hv=portfolioHeaderRow('FACTURAS & ABONOS VENTAS');
+  fv.slice(hv+1).forEach(r=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='')return;
+    const cond=String(r[3]??'').trim().toUpperCase();
+    if(cond==='CONTADO'){
+      const x=ensureMonth(r[4]),v=num(r[5]);
+      if(x&&v>0)x.in+=v;
+    }
+  });
+
+  // FACTURAS DE COMPRA: solo CONTADO sale inmediatamente de caja.
+  // Las compras a crédito salen mediante ABONOS A PROVEEDOR.
+  const fc=DB['FACTURAS & ABONOS COMPRA']||[];
+  const hc=portfolioHeaderRow('FACTURAS & ABONOS COMPRA');
+  fc.slice(hc+1).forEach(r=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='')return;
+    const cond=String(r[3]??'').trim().toUpperCase();
+    if(cond==='CONTADO'){
+      const x=ensureMonth(r[4]),v=num(r[5]);
+      if(x&&v>0)x.pc+=v;
+    }
+  });
+
+  // ABONOS: en estas hojas se guardan en columnas 13=FECHA, 14=FACTURA, 15=MONTO.
+  // Se usan solo las filas que tengan una fecha de abono y un monto positivo.
+  function addAbonos(name,entrada){
+    const rs=DB[name]||[];
+    const h=portfolioHeaderRow(name);
+    rs.slice(h+1).forEach(r=>{
+      if(!Array.isArray(r))return;
+      const fecha=r[13],monto=num(r[15]);
+      if(!fecha||monto<=0)return;
+      const x=ensureMonth(fecha);
+      if(x){
+        if(entrada)x.in+=monto;
+        else x.pc+=monto;
+      }
+    });
+  }
+  addAbonos('FACTURAS & ABONOS VENTAS',true);
+  addAbonos('FACTURAS & ABONOS COMPRA',false);
+
+  const data=[['AÑO','MES','MES_TEXTO','ENTRADAS','SALIDAS COMPRAS','SALIDAS GASTOS','FLUJO NETO','SALDO ACUMULADO']];
+  let saldo=0;
+  [...months.values()].sort((a,b)=>a.y-b.y||a.m-b.m).forEach(x=>{
+    const net=x.in-x.pc-x.g;
+    saldo+=net;
+    data.push([x.y,x.m,x.text,x.in,x.pc,x.g,net,saldo]);
+  });
+  DB['FLUJO DE CAJA']=data;
+}
+
+
+
+function businessResultSummary(){
+  // VENTAS: total facturado desde FACTURAS & ABONOS VENTAS.
+  // COSTO DE LO VENDIDO: costo unitario real de cada línea vendida x cantidad.
+  const fv=DB['FACTURAS & ABONOS VENTAS']||[];
+  const hf=portfolioHeaderRow('FACTURAS & ABONOS VENTAS');
+  const ventas=fv.slice(hf+1).reduce((a,r)=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='') return a;
+    return a+num(r[5]);
+  },0);
+
+  const vr=DB['VENTAS']||[];
+  const hv=vr.findIndex(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()==='CODIGO');
+  const costo=vr.slice(hv>=0?hv+1:1).reduce((a,r)=>{
+    if(!Array.isArray(r)||!r[0]) return a;
+    return a+(num(r[6])*num(r[7]));
+  },0);
+
+  const gastos=expenseRows().reduce((a,r)=>a+num(r[2]),0);
+  return {ventas,costo,utilidad:ventas-costo,gastos,operativa:ventas-costo-gastos};
+}
+
+function portfolioSummary(sheet){
+  const rs=DB[sheet]||[];
+  const h=portfolioHeaderRow(sheet);
+  const rowsData=rs.slice(h+1);
+  let total=0, saldo=0, pendientes=0, vencidas=0;
+  const today=new Date(); today.setHours(0,0,0,0);
+  rowsData.forEach(r=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='') return;
+    const importe=num(r[5]), pago=num(r[7]), sal=num(r[8]);
+    total+=importe; saldo+=sal;
+    if(sal>0){
+      pendientes++;
+      const venc=r[6];
+      if(venc){
+        const d=new Date(String(venc).slice(0,10)+'T00:00:00');
+        if(!isNaN(d)&&d<today) vencidas++;
+      }
+    }
+  });
+  return {total,saldo,pendientes,vencidas};
+}
+
+function renderFlow(c){
+  rebuildCashFlow();
+  save();
+
+  const rs=rows('FLUJO DE CAJA');
+  const data=rs.slice(1);
+  const last=data[data.length-1]||[];
+  const entradas=data.reduce((a,r)=>a+num(r[3]),0);
+  const compras=data.reduce((a,r)=>a+num(r[4]),0);
+  const gastos=data.reduce((a,r)=>a+num(r[5]),0);
+  const neto=entradas-compras-gastos;
+  const saldo=last[7]!=null?num(last[7]):neto;
+
+  const result=businessResultSummary();
+  const clientes=portfolioSummary('FACTURAS & ABONOS VENTAS');
+  const proveedores=portfolioSummary('FACTURAS & ABONOS COMPRA');
+  const posicion=saldo+clientes.saldo-proveedores.saldo;
+
+  const flowRows=data.map(r=>`
+    <div class="flow-row">
+      <div><b>${esc(r[2]??'')}</b><small>${esc(r[0]??'')} · ${esc(r[1]??'')}</small></div>
+      <div class="flow-values">
+        <span>Entradas<br><b>${money(r[3])}</b></span>
+        <span>Compras<br><b>${money(r[4])}</b></span>
+        <span>Gastos<br><b>${money(r[5])}</b></span>
+        <span>Flujo<br><b>${money(r[6])}</b></span>
+      </div>
+    </div>`).join('');
+
+  c.innerHTML=`
+    <div class="title">RESULTADO Y FLUJO DE CAJA</div>
+    <div class="sub">Resultado de las ventas, costo de lo vendido, caja y cartera.</div>
+
+    <div class="card">
+      <h3>📊 RESULTADO DEL NEGOCIO</h3>
+      <div class="summary-list">
+        <div><span>VENTAS</span><b>${money(result.ventas)}</b></div>
+        <div><span>(−) COSTO DE LO VENDIDO</span><b>${money(result.costo)}</b></div>
+        <div><span><b>UTILIDAD BRUTA</b></span><b>${money(result.utilidad)}</b></div>
+        <div><span>(−) GASTOS</span><b>${money(result.gastos)}</b></div>
+        <div><span><b>UTILIDAD OPERACIONAL</b></span><b>${money(result.operativa)}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💵 FLUJO DE CAJA</h3>
+      <div class="summary-list">
+        <div><span>Entradas de efectivo</span><b>${money(entradas)}</b></div>
+        <div><span>Salidas por compras</span><b>${money(compras)}</b></div>
+        <div><span>Salidas por gastos</span><b>${money(gastos)}</b></div>
+        <div><span><b>FLUJO NETO</b></span><b>${money(neto)}</b></div>
+        <div><span>Saldo acumulado</span><b>${money(saldo)}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👥 CARTERA DE CLIENTES</h3>
+      <div class="summary-list">
+        <div><span>Total facturado</span><b>${money(clientes.total)}</b></div>
+        <div><span>Saldo por cobrar</span><b>${money(clientes.saldo)}</b></div>
+        <div><span>Facturas pendientes</span><b>${clientes.pendientes}</b></div>
+        <div><span>Facturas vencidas</span><b>${clientes.vencidas}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🚚 CARTERA DE PROVEEDORES</h3>
+      <div class="summary-list">
+        <div><span>Total comprado</span><b>${money(proveedores.total)}</b></div>
+        <div><span>Saldo por pagar</span><b>${money(proveedores.saldo)}</b></div>
+        <div><span>Facturas pendientes</span><b>${proveedores.pendientes}</b></div>
+        <div><span>Facturas vencidas</span><b>${proveedores.vencidas}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📌 POSICIÓN DEL NEGOCIO</h3>
+      <div class="summary-list">
+        <div><span>Dinero en caja</span><b>${money(saldo)}</b></div>
+        <div><span>Por cobrar</span><b>${money(clientes.saldo)}</b></div>
+        <div><span>Por pagar</span><b>${money(proveedores.saldo)}</b></div>
+        <div><span><b>POSICIÓN NETA</b></span><b>${money(posicion)}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📅 MOVIMIENTO MENSUAL DE CAJA</h3>
+      ${flowRows || '<div class="empty">Aún no hay movimientos de caja registrados.</div>'}
+    </div>
+  `;
+}
+
+function renderLots(c){let rs=rows('LOTES').slice(1);let today=new Date();c.innerHTML=`<div class="title">LOTES DE INVENTARIO</div><div class="sub">Vencimiento de los lotes: un mes después de la compra.</div><div class="tablewrap"><table class="tbl"><tr>${headers(rows('LOTES')).map(h=>`<th>${esc(h)}</th>`).join('')}</tr>${rs.map(r=>{let d=new Date(r[6]),days=Math.ceil((d-today)/86400000);let st=days<0?'VENCIDO':days<=7?'POR VENCER':'VIGENTE';return `<tr>${r.map((v,j)=>`<td>${j===6?date(v):j===7?days:j===8?st:esc(v??'')}</td>`).join('')}</tr>`}).join('')}</table></div>`}
+function portfolioHeaderRow(name){const rs=rows(name);const i=rs.findIndex(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim().toUpperCase()==='N_FACTURA'));return i>=0?i:0}
+function portfolioDataRows(name){const rs=rows(name);const h=portfolioHeaderRow(name);return rs.slice(h+1).filter(r=>Array.isArray(r)&&r.some(v=>v!==null&&v!==''));}
+function calcPortfolio(t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';let rs=portfolioDataRows(name).filter(r=>r[2]!=null&&r[2]!=='');return {balance:rs.reduce((s,r)=>s+num(r[8]),0),rows:rs}}
+function compactPortfolioTable(t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';let h=rows(name)[portfolioHeaderRow(name)]||[];let rs=portfolioDataRows(name).filter(r=>r[2]!=null&&r[2]!=='');let cols=t==='venta'?['ID_CLIENTE','CLIENTE','N_FACTURA','CONDICION','FECHA _FACTURA','IMPORTE','FECHA_VENCIMIENTO','PAGO','SALDO','ESTADO','DIAS','RANGO']:['ID_PROVEEDOR','PROVEEDOR','N_FACTURA','CONDICION','FECHA _FACTURA','IMPORTE','FECHA_VENCIMIENTO','PAGO','SALDO','ESTADO','DIAS','RANGO'];let idx=cols.map(x=>h.findIndex(y=>String(y??'').trim().toUpperCase()===x));return `<div class="tablewrap cartera-table"><table class="tbl"><thead><tr>${cols.map(x=>`<th>${esc(x.replace('FECHA _FACTURA','FECHA FACTURA'))}</th>`).join('')}</tr></thead><tbody>${rs.map(r=>`<tr>${idx.map((j,k)=>{let v=j>=0?r[j]:'';if(cols[k].includes('FECHA'))v=date(v);if(cols[k]==='IMPORTE'||cols[k]==='PAGO'||cols[k]==='SALDO')v=money(v);return `<td>${esc(v??'')}</td>`}).join('')}</tr>`).join('')||'<tr><td colspan="12" class="empty">No hay facturas registradas.</td></tr>'}</tbody></table></div>`}
+function abonosTable(t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA',h=rows(name)[portfolioHeaderRow(name)]||[],rs=portfolioDataRows(name),f=h.findIndex(x=>String(x??'').trim().toUpperCase().startsWith('FACTURA')),dateI=h.findIndex(x=>String(x??'').trim().toUpperCase()==='FECHA'),m=h.findIndex(x=>String(x??'').trim().toUpperCase()==='MONTO');if(f<0||dateI<0||m<0)return '';let data=rs.filter(r=>r[f]!=null&&r[m]!=null).map(r=>`<tr><td>${date(r[dateI])}</td><td>${esc(r[f])}</td><td>${money(r[m])}</td></tr>`).join('');return `<h3 style="margin-top:18px">ABONOS REGISTRADOS</h3><div class="tablewrap"><table class="tbl"><thead><tr><th>FECHA</th><th>N° FACTURA</th><th>MONTO</th></tr></thead><tbody>${data||'<tr><td colspan="3" class="empty">No hay abonos registrados.</td></tr>'}</tbody></table></div>`}
+function renderPortfolio(c,t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';let p=calcPortfolio(t);c.innerHTML=`<div class="title">${name}</div><div class="cards"><div class="card metric"><span>Total cartera</span><b>${money(p.balance)}</b></div><div class="card metric"><span>Facturas</span><b>${p.rows.length}</b></div></div><div class="card" style="margin-top:12px"><h3>Facturas</h3>${compactPortfolioTable(t)}${abonosTable(t)}</div><div class="card" style="margin-top:12px"><h3>Registrar abono</h3><form class="form" onsubmit="addAbono(event,'${t}')"><div class="field"><label>N° factura</label><input id="abfact" type="number" min="1" required></div><div class="field"><label>Valor abono</label><input id="abval" type="number" min="0" required></div><div class="actions"><button class="btn">Registrar abono</button></div></form></div>`}
+function addAbono(e,t){
+  e.preventDefault();
+  const name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  const rs=DB[name]||[];
+  const invoice=num(document.getElementById('abfact').value);
+  const v=num(document.getElementById('abval').value);
+  if(!invoice||v<=0)return toast('Ingresa una factura y un valor de abono válido.');
+  const h=portfolioHeaderRow(name);
+  const r=rs.find((row,i)=>i>h && num(row?.[2])===invoice);
+  if(!r)return toast('Factura no encontrada');
+  const saldoActual=Math.max(0,num(r[5])-num(r[7]));
+  if(v>saldoActual)return toast(`El abono no puede superar el saldo pendiente de ${money(saldoActual)}.`);
+  r[7]=num(r[7])+v;
+  r[8]=Math.max(0,num(r[5])-r[7]);
+  const venc=new Date(r[6]);
+  r[9]=r[8]===0?'CANCELADO':(venc<new Date()?'VENCIDA':'PENDIENTE');
+  r[10]=r[8]===0?'-':(r[10]==='-'?Math.max(0,Math.ceil((venc-new Date())/86400000)):r[10]);
+  const fechaAbono=iso(new Date());
+  const abonoRow=[];
+  const width=Math.max(16, ...rs.map(x=>Array.isArray(x)?x.length:0));
+  for(let i=0;i<width;i++)abonoRow.push(null);
+  abonoRow[13]=fechaAbono;
+  abonoRow[14]=invoice;
+  abonoRow[15]=v;
+  rs.push(abonoRow);
+  DB[name]=rs;
+  rebuildCashFlow();
+  save();
+  toast(`Abono registrado el ${date(fechaAbono)}`);
+  show(t==='venta'?'carteraventa':'carteracompra');
+}
+function salesHistoryTable(){let rs=rows('FACTURAS & ABONOS VENTAS').slice(1).filter(r=>r[2]!=null&&r[2]!==''),h=['N° FACTURA','CLIENTE','CONDICION','FECHA','IMPORTE','PAGO','SALDO','ESTADO'];return `<div class="tablewrap"><table class="tbl"><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rs.slice(-10).reverse().map(r=>`<tr><td>${esc(r[2])}</td><td>${esc(r[1]||'Venta directa')}</td><td>${esc(r[3])}</td><td>${date(r[4])}</td><td>${money(r[5])}</td><td>${money(r[7])}</td><td>${money(r[8])}</td><td>${esc(r[9])}</td></tr>`).join('')}</tbody></table></div>`}
+function updateInvoiceSheet(t,invoice,d,venc,party,total,cond,items){
+  let name=t==='venta'?'FACTURA VENTA':'FACTURA COMPRA',r=DB[name]||[];
+  if(!r.length)return;
+  // Fecha de vencimiento de la cartera = vencimiento del crédito (0, 8 o 15 días).
+  // Para FACTURA COMPRA además mostramos, por cada producto, el vencimiento del LOTE (1 mes desde la compra).
+  for(let i=0;i<r.length;i++){
+    if(String(r[i][6]??'')==='Factura No.:')r[i][7]=invoice;
+    if(String(r[i][6]??'')==='Fecha:')r[i][7]=iso(d);
+    if(String(r[i][6]??'')==='Fecha de vencimiento:')r[i][7]=iso(venc);
+    if(String(r[i][6]??'')==='Pago Contado')r[i][8]=cond===0?total:0;
+    if(String(r[i][6]??'').trim()==='Pago Crédito')r[i][8]=cond>0?total:0;
+    if(String(r[i][6]??'').trim()==='Días Crédito')r[i][8]=cond;
+  }
+  let infoRow=r.findIndex(x=>String(x[0]??'').toUpperCase()===(t==='venta'?'CLIENTE':'PROVEEDOR'));
+  if(infoRow>=0)r[infoRow][1]=party;
+  let header=r.findIndex(x=>String(x[0]??'').toUpperCase()==='CÓDIGO'||String(x[0]??'').toUpperCase()==='CODIGO');
+  if(header>=0){
+    // Conservamos la sección INFORMACIÓN DE PAGO de la plantilla y reemplazamos solo las filas de productos.
+    let payStart=r.findIndex((row,idx)=>idx>header && (String(row[7]??'').trim()==='Total Factura'||String(row[7]??'').trim()==='INFORMACIÓN DE PAGO'));
+    let removeCount=payStart>=0?payStart-header-1:Math.max(0,r.length-(header+1));
+    if(removeCount>0)r.splice(header+1,removeCount);
+    let itemRows=items.map(x=>{
+      if(t==='compra'){
+        let loteVenc=new Date(d);
+        loteVenc.setMonth(loteVenc.getMonth()+1);
+        return [x.code,x.name,x.qty,x.cost,null,x.total,iso(loteVenc),null,null];
+      }
+      return [x.code,x.name,x.qty,x.price,null,x.total,null,null,null];
+    });
+    r.splice(header+1,0,...itemRows);
+  }
+  save();
+}
+function invoiceOptions(t,selected){
+  const name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  return rows(name).slice(1).filter(r=>r&&r[2]!=null&&r[2]!=='').sort((a,b)=>num(a[2])-num(b[2])).map(r=>`<option value="${esc(r[2])}" ${num(r[2])===num(selected)?'selected':''}>Factura N° ${esc(r[2])} — ${esc(r[1]||'')}</option>`).join('');
+}
+function renderLinkedInvoice(c,t,invoice){
+  const portName=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  const pr=rows(portName).slice(1).find(r=>num(r[2])===num(invoice));
+  if(!pr){c.innerHTML='<div class="empty">Factura no encontrada.</div>';return}
+  const sheet=t==='venta'?'VENTAS':'COMPRAS';
+  const all=rows(sheet); const hi=all.findIndex(r=>String(r?.[0]??'').toUpperCase()==='CODIGO');
+  const lines=all.slice(hi+1).filter(r=>r&&r[0]&&num(r[r.length-1])===num(invoice));
+  const dateFactura=date(pr[4]), venc=date(pr[6]), total=num(pr[5]), pago=num(pr[7]), saldo=num(pr[8]), cond=pr[3]||'CONTADO';
+  const party=pr[1]||'';
+  const headersLine=t==='venta'?['Código','Producto','Cantidad','Precio Unit.','Total']:['Código','Producto','Cantidad','Costo Unit.','Vencimiento lote','Total'];
+  const body=lines.map(r=>{
+    const lote=t==='compra'?(()=>{let d=new Date(r[1]);d.setMonth(d.getMonth()+1);return date(d)})():'';
+    return t==='venta'?`<tr><td>${esc(r[0])}</td><td>${esc(r[4])}</td><td>${num(r[7])}</td><td>${money(r[5])}</td><td>${money(r[8])}</td></tr>`:`<tr><td>${esc(r[0])}</td><td>${esc(r[4])}</td><td>${num(r[6])}</td><td>${money(r[5])}</td><td>${lote}</td><td>${money(r[7])}</td></tr>`;
+  }).join('');
+  c.innerHTML=`<div class="title">${t==='venta'?'FACTURA DE VENTA':'FACTURA DE COMPRA'}</div>
+  <div class="sub">Factura vinculada directamente con ${t==='venta'?'VENTAS':'COMPRAS'} y ${t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA'}.</div>
+  <div class="card"><div class="form"><div class="field"><label>Seleccionar factura</label><select onchange="showLinkedInvoice('${t}',this.value)">${invoiceOptions(t,invoice)}</select></div><div class="field"><label>N° factura</label><input value="${esc(invoice)}" readonly></div><div class="field"><label>${t==='venta'?'Cliente':'Proveedor'}</label><input value="${esc(party)}" readonly></div><div class="field"><label>Condición</label><input value="${esc(cond)}" readonly></div><div class="field"><label>Fecha</label><input value="${esc(dateFactura)}" readonly></div><div class="field"><label>Fecha de vencimiento crédito</label><input value="${esc(venc)}" readonly></div></div></div>
+  <div class="card" style="margin-top:12px"><h3>Detalle de la factura N° ${esc(invoice)}</h3><div class="tablewrap"><table class="tbl"><thead><tr>${headersLine.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body||'<tr><td colspan="6" class="empty">No hay productos asociados a esta factura.</td></tr>'}</tbody></table></div>
+  <div class="card" style="margin-top:10px"><b>Total factura: ${money(total)}</b><br>Pago: ${money(pago)}<br>Saldo: ${money(saldo)}<br>Estado: <b>${esc(pr[9]||'')}</b></div></div>`;
+}
+function showLinkedInvoice(t,invoice){let c=document.getElementById('content');renderLinkedInvoice(c,t,num(invoice))}
+function renderInvoice(c,t){
+  const name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  const list=rows(name).slice(1).filter(r=>r&&r[2]!=null&&r[2]!=='');
+  const latest=list.reduce((m,r)=>Math.max(m,num(r[2])),0);
+  if(!latest){c.innerHTML=`<div class="title">${t==='venta'?'FACTURA VENTA':'FACTURA COMPRA'}</div><div class="empty">Todavía no hay facturas registradas.</div>`;return}
+  renderLinkedInvoice(c,t,latest);
+}
+function backup(){let blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='DISTRIHUEVOS BONANZA_RESPALDO.json';a.click()}
+async function importExcel(file){if(!file)return;try{if(!window.XLSX){await loadXLSX()}let buf=await file.arrayBuffer();let wb=XLSX.read(buf,{type:'array',cellDates:true});let n={};wb.SheetNames.forEach(s=>{n[s]=XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,raw:true,defval:null})});DB=n;save();toast('Excel importado');show('menu')}catch(e){alert('No se pudo importar el Excel: '+e.message)}}
+function loadXLSX(){return new Promise((res,rej)=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+function resetTestData(){
+  const ok=confirm('¿Seguro que quieres comenzar de nuevo?\n\nSe borrarán los datos de prueba de compras, ventas, facturas, abonos, lotes, gastos y flujo de caja.\n\nSe conservarán productos, clientes, proveedores y la estructura del sistema.');
+  if(!ok)return;
+
+  // IMPORTANTE: no dejamos solo la primera fila de cada hoja.
+  // Las hojas COMPRAS/VENTAS necesitan sus encabezados para que
+  // la sincronización pueda leer las nuevas operaciones, y las hojas
+  // de cartera necesitan conservar su fila N_FACTURA + AGING.
+  const copyRows=n=>{
+    const base=INITIAL[n]||[];
+    if(!base.length)return [];
+    if(n==='COMPRAS'||n==='VENTAS') return base.slice(0,4).map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='LOTES') return base.slice(0,2).map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='FACTURA COMPRA'||n==='FACTURA VENTA') return base.map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='FACTURAS & ABONOS COMPRA'||n==='FACTURAS & ABONOS VENTAS'){
+      const out=base.slice(0,3).map(r=>Array.isArray(r)?[...r]:r);
+      // Conserva las tablas auxiliares de ABONOS/AGING, pero elimina
+      // cualquier factura/abono de prueba de las columnas principales.
+      for(let i=3;i<base.length;i++){
+        const r=Array.isArray(base[i])?[...base[i]]:[];
+        // Borra también ABONOS (FECHA/FACTURA/MONTO) para comenzar desde cero.
+        for(let j=0;j<16;j++) r[j]=null;
+        out.push(r);
+      }
+      return out;
+    }
+    if(n==='GASTOS') return (base.slice(0,3)||[]).map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='FLUJO DE CAJA') return base.slice(0,2).map(r=>Array.isArray(r)?[...r]:r);
+    return base.map(r=>Array.isArray(r)?[...r]:r);
+  };
+
+  const tx=['COMPRAS','VENTAS','FACTURA VENTA','FACTURA COMPRA','FACTURAS & ABONOS VENTAS','FACTURAS & ABONOS COMPRA','LOTES','GASTOS','FLUJO DE CAJA'];
+  tx.forEach(n=>DB[n]=copyRows(n));
+
+  // Reiniciar inventario conservando los productos configurados.
+  const prod=DB['BASE DE DATOS DE PRODUCTOS']||[];
+  const phIndex=prod.findIndex(r=>Array.isArray(r)&&r.some(v=>String(v).toUpperCase().includes('CODIGO')));
+  const ph=phIndex>=0?prod[phIndex]:[];
+  const ih=(INITIAL['INVENTARIO']||[])[3]||['CODIGO','NOMBRE DEL PRODUCTO','COMPRAS','VENTAS','STOCK','COSTO UNITARIO','VALOR DEL INVENTARIO'];
+  const codeIdx=ph.findIndex(v=>String(v).toUpperCase().includes('CODIGO'));
+  const nameIdx=ph.findIndex(v=>String(v).toUpperCase().includes('NOMBRE'));
+  const invRows=[Array.isArray((INITIAL['INVENTARIO']||[])[0])?[...(INITIAL['INVENTARIO']||[])[0]]:['INVENTARIO'],[null,null,null,null,null,null,null,'TOTAL INVENTARIO'],[null,null,null,null,null,null,null,null],Array.isArray(ih)?[...ih]:ih];
+  prod.slice(phIndex+1).forEach(r=>{
+    if(!Array.isArray(r))return;
+    const code=codeIdx>=0?r[codeIdx]:r[0];
+    const name=nameIdx>=0?r[nameIdx]:r[1];
+    if(code && name) invRows.push([code,name,0,0,0,0,0]);
+  });
+  DB['INVENTARIO']=invRows;
+
+  // Reconstrucción final: debe quedar lista para que la primera compra
+  // aparezca inmediatamente en INVENTARIO y en FACTURAS & ABONOS COMPRA.
+  ensureInvoiceLinks();
+  normalizeInventory();
+  save();
+  toast('Sistema reiniciado correctamente: estructura conservada y movimientos en cero');
+  show('menu');
+}
+async function exportExcel(){try{if(!window.XLSX)await loadXLSX();let wb=XLSX.utils.book_new();sheets.forEach(name=>{let ws=XLSX.utils.aoa_to_sheet(DB[name]||[]);XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31))});XLSX.writeFile(wb,'DISTRIHUEVOS BONANZA_APP.xlsx')}catch(e){alert('No se pudo exportar: '+e.message)}}
+setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleString('es-CO'),1000);show('menu');
+</script></body></html>
