@@ -1,0 +1,1270 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#232b1f"><title>DistriHuevos Bonanza</title>
+<style>
+:root{--bg:#f7f1df;--dark:#232b1f;--olive:#3a4a32;--gold:#e8a33d;--red:#b1472e;--green:#4c7a4c;--ink:#23281f;--muted:#6b6d60;--line:#ddd2ae;--white:#fffdf6}*{box-sizing:border-box}body{margin:0;background:var(--dark);font-family:Arial,sans-serif;color:var(--ink)}button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1180px;margin:auto;background:var(--bg);min-height:100vh}.top{background:var(--dark);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:20}.brand{font-size:21px;font-weight:800}.brand small{display:block;color:var(--gold);font-size:10px;letter-spacing:1.4px;margin-top:3px}.clock{font-size:12px;color:#ddd}.toolbar{padding:10px 14px;background:#fff8e8;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:69px;z-index:19}.btn{border:1px solid var(--olive);background:var(--olive);color:white;border-radius:8px;padding:9px 12px}.btn.alt{background:white;color:var(--olive)}.btn.danger{background:var(--red);border-color:var(--red)}.nav{display:flex;overflow:auto;gap:6px;padding:10px 14px;background:#eee5cc;border-bottom:1px solid var(--line)}.nav button{white-space:nowrap;border:1px solid var(--line);background:#fff8e8;border-radius:999px;padding:8px 11px}.nav button.active{background:var(--olive);color:#fff}.content{padding:16px}.title{font-size:22px;font-weight:800;margin:5px 0 4px}.sub{color:var(--muted);margin-bottom:14px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px}.metric b{display:block;font-size:20px;margin-top:5px}.metric span{font-size:12px;color:var(--muted)}.form{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}.field input,.field select{width:100%;padding:9px;border:1px solid #cfc6a9;border-radius:8px;background:white}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap}.tablewrap{overflow:auto;background:white;border:1px solid var(--line);border-radius:10px}.tbl{border-collapse:collapse;width:100%;min-width:760px}.tbl th,.tbl td{border-bottom:1px solid #eee4ca;padding:8px;text-align:left;font-size:12px;white-space:nowrap}.tbl th{background:#eee5cc;position:sticky;top:0;z-index:1}.empty{padding:25px;text-align:center;color:var(--muted)}.badge{padding:3px 7px;border-radius:99px;font-size:11px;background:#eee}.ok{color:var(--green);font-weight:700}.warn{color:#9b6a00;font-weight:700}.bad{color:var(--red);font-weight:700}.invoice{background:#fff;border:1px solid var(--line);padding:20px;border-radius:12px}.invoice h2{margin:0}.invoicegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:15px;z-index:50}.modal.show{display:flex}.modalbox{background:var(--bg);max-width:850px;width:100%;max-height:92vh;overflow:auto;border-radius:14px;padding:18px}.close{float:right;border:0;background:none;font-size:22px}.toast{position:fixed;right:15px;bottom:15px;background:var(--dark);color:#fff;padding:11px 14px;border-radius:9px;display:none;z-index:100}.toast.show{display:block}.hint{font-size:12px;color:var(--muted)}@media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr 1fr}.top{position:static}.toolbar{position:static}.nav{position:sticky;top:0;z-index:15}}@media(max-width:520px){.cards,.form{grid-template-columns:1fr}.content{padding:10px}.top{padding:13px}.brand{font-size:18px}}
+
+.summary-list{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.summary-list>div{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+.summary-list>div:last-child{border-bottom:0}
+.summary-list span{font-size:14px}
+.summary-list b{font-size:15px}
+.flow-row{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+.flow-row:last-child{border-bottom:0}
+.flow-row small{display:block;opacity:.65;margin-top:3px}
+.flow-values{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.flow-values span{background:rgba(0,0,0,.035);border-radius:10px;padding:8px;font-size:12px}
+.flow-values b{font-size:13px}
+
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--dark);padding:18px}
+.auth-box{background:var(--bg);width:100%;max-width:400px;border-radius:16px;padding:26px 24px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.auth-logo{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:16px}
+.auth-logo img{height:64px;width:64px;border-radius:50%;object-fit:cover;background:#fff;margin-bottom:8px}
+.auth-logo b{font-size:18px}
+.auth-logo small{color:var(--muted);letter-spacing:1px;font-size:10px}
+.auth-title{font-size:17px;font-weight:800;margin:4px 0 14px;text-align:center}
+.auth-field{margin-bottom:12px}
+.auth-field label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+.auth-field input{width:100%;padding:10px;border:1px solid #cfc6a9;border-radius:8px;background:white}
+.auth-actions{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.auth-link{background:none;border:0;color:var(--olive);font-size:12px;text-decoration:underline;padding:4px;text-align:center}
+.auth-error{background:#fbe4dc;color:var(--red);border:1px solid #e8b8a8;border-radius:8px;padding:8px 10px;font-size:12px;margin-bottom:10px}
+.auth-ok{background:#e5f0e5;color:var(--green);border:1px solid #bcd8bc;border-radius:8px;padding:8px 10px;font-size:12px;margin-bottom:10px}
+.auth-hint{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+
+</style></head><body><div id="authScreen"></div><div class="app" id="appRoot" style="display:none"><header class="top"><img src="data:image/png;base64,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PYmJyUMv43vf+x4vvvgiixcvxuPx8NBDDw0dAkBWVhYAJ554In/9619Zu3btoLGiKJKQkBBzlsWhKAqNjY0DpAqHw2zatInMzEwA1q9fz+jRo8nPz4c4Kbq7uzn77LMBeOCBB8jLy6O0tJSzzz6bO+64I/ZZksTJC0/nviWPsvC0s5AkmUg4xL/++Vduv+U66utrsVqtg57lW3zDSWC1Wunr7eH+exfz5BN/IBQMIksyp591Hvfe/0emTDsW4vL31VdfTTgcHrhWluWBe1x44YU8++yzdHd3D5w/iClTphCNRunv72fixIk888wzjBgxYuB8VlYW69ev58ILLxw4JkkSf/nLX7j55pshrnAff/zxHHPMMQDY7XZaWloGdpS7776bGTNmMHbsWLZu3cq//vUvTjvtNB588EFefPFFJkyYQCgU4vnnn6etrY2MzGxuvPkurr1xMckpqRiGwbq1K7nlxp+xY/sWLBbLt3rCR/CNNZFarVaamxp58Ld3sGH9KgRBIMHt4bIfXsWZ516EgICqatx++208+eSTXH311Vx99dUDMUIfRVlZGePHj2fJkiVcddVVg851d3fT399PTk7OJ17736CmpoZLL710wMzZ0tLCyy+/zOTJkzn77LPZvHkzhYWFZGVl8fjjj+NwOFi7di3HHnssjz/+OJdffvnAvcr37uahB+9i7+4dCIJIamoaP73mV8w+fv7XakY9kkyk30gSHFSA773rFnbv3I4gCGTn5HLNdbcwZVpstQVYvnw5ixYt4r333mPGjBmfGcty4oknYrFYeO2114aeOiw4uLLX19dzzjnnMGLECF544QXOO+88li9fzrhx43jqqae4+OKLSUpK4q677uLWW29l165djBw5ElVV0TQNi8VCZ0c7Dz94D8s/eAfiusyPr76Bkxec/rUR4VsSHEZYrVZqaw5w1+2/pHzvbgCGl47ixlvupLi4dNDYrVu3Mnv2bCZMmEA4HKa2tpaSkhIeffRRxo4dO2hsfX09iqJQVFQ06PhXiVtvvZW7776bm266iSuvvJLU1NSBc8cffzyiKPL+++/T0dHBxRdfTFFREY8++igAihLlkYd+wysvPYdhgMPh4CdX38CCU8/6WohwJJHgGyUYWq1WmhrruffOW9i3dw8CMG78JO64Z8nHCAAwadIk/vrXv+LxeCgsLOR73/sevb29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" alt="DistriHuevos Bonanza" style="height:72px;width:72px;border-radius:50%;object-fit:cover;background:#fff;flex-shrink:0"><div class="brand" style="display:flex;flex-direction:column;align-items:center;text-align:center">DISTRIHUEVOS BONANZA<small>Huevos y Gallinas</small></div><div class="clock" id="clock"></div></header><div class="toolbar"><button class="btn" onclick="show('menu')">🏠 Menú</button><button class="btn alt" onclick="backup()">💾 Respaldo JSON</button><button class="btn" style="background:#b45309" onclick="resetTestData()">🧹 Nuevo inicio</button><button class="btn alt" onclick="document.getElementById('file').click()">📥 Importar Excel</button><button class="btn" onclick="exportExcel()">📤 Exportar Excel</button><button class="btn alt" onclick="openAccountModal()">👤 Mi cuenta</button><button class="btn danger" onclick="logout()">🚪 Cerrar sesión</button><input id="file" type="file" accept=".xlsx,.xlsm" hidden onchange="importExcel(this.files[0])"></div><nav class="nav" id="nav"></nav><main class="content" id="content"></main></div><div class="modal" id="modal"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalbody"></div></div></div><div class="toast" id="toast"></div>
+<script>
+const INITIAL={"MENU": [["MENU", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1008], ["BASE DE DATOS DE PRODUCTOS", null, null, "CLIENTES", null, "FACTURA COMPRA"], ["INVENTARIO", null, null, "FACTURA VENTA", null, "FACTURAS & ABONOS COMPRA"], ["COMPRAS", null, null, "FACTURA & ABONOS VENTA", null, "PROVEEDOR"], ["VENTAS"]], "GASTOS": [["GASTOS"], [null, null, "TOTAL GASTO", "=SUM(E4:E100000)"], ["TABLA DE GASTOS", null, "CONCEPTO", "FECHA", "VALOR"], ["GASOLONA CARRO"], ["GASOLINA MOTO"], ["DIA EMPLEADO"], ["ALMUERZO"], ["ARRIENDO"]], "FLUJO DE CAJA": [["FLUJO DE CAJA"], ["AÑO", "MES", "MES_TEXTO", "ENTRADAS", "SALIDAS COMPRAS", "SALIDAS GASTOS", "FLUJO NETO", "SALDO ACUMULADO"], [2026, 8, "agosto", 420000, 1870000, 0, -1450000, -1450000]], "BASE DE DATOS DE PRODUCTOS": [["LISTA DE PRODUCTOS"], ["CODIGO", "NOMBRE DEL PRODUCTO", null, "CONDICION"], ["A001", "HUEVO CAMPESINO", null, "CONDICION", "DIAS"], ["A002", "HUEVO TIPO A ", null, "CONTADO", 0], ["A003", "HUEVO TIPO AA", null, "CREDITO", 8], ["A004", "HUEVO TIPO AAA", null, null, 15], ["A005", "CANASTA"], ["A0061", "HUEVO TIPO B 12.000"], ["A0062", "HUEVO TIPO B 12.500"], ["A0063", "HUEVO TIPO B 11.500"]], "INVENTARIO": [["INVENTARIO"], [null, null, null, null, null, null, null, "TOTAL INVENTARIO"], [null, null, null, null, null, null, null, "=SUBTOTAL(9,G5:G100000)"], ["CODIGO", "NOMBRE DEL PRODUCTO", "COMPRAS", "VENTAS", "STOCK", "COSTO UNITARIO", "VALOR DEL INVENTARIO"], ["A001", "HUEVO CAMPESINO", 50, 30, 20, 11000, 220000], ["A002", "HUEVO TIPO A ", 0, 0, 0, 0, 0], ["A003", "HUEVO TIPO AA", 0, 0, 0, 0, 0], ["A004", "HUEVO TIPO AAA", 0, 0, 0, 0, 0], ["A005", "CANASTA", 0, 0, 0, 0, 0], ["A0061", "HUEVO TIPO B 12.000", 0, 0, 0, 0, 0], ["A0062", "HUEVO TIPO B 12.500", 0, 0, 0, 0, 0], ["A0063", "HUEVO TIPO B 11.500", 0, 0, 0, 0, 0]], "COMPRAS": [["COMPRAS"], [null, null, null, null, null, null, null, "TOTAL"], [null, null, null, null, null, null, null, "=SUBTOTAL(9,H5:H100000)"], ["CODIGO", "FECHA", "MES", "AÑO", "NOMBRE DEL PRODUCTO", "COSTO UNITARIO", "CANTIDAD", "TOTAL"], ["A001", "2026-08-12T00:00:00", "agosto", 2026, "HUEVO CAMPESINO", 11000, 50, 550000]], "VENTAS": [["VENTAS"], [null, null, null, null, null, null, null, null, "TOTAL VENTA", "TOTAL UTILIAD"], [null, null, null, null, null, null, null, null, "=SUBTOTAL(9,I5:I100000)", "=SUBTOTAL(9,J5:J100000)"], ["CODIGO", "FECHA", "MES", "AÑO", "NOMBRE DEL PRODUCTO", "PRECIO VENTA", "COSTO UNITARIO", "CANTIDAD", "TOTAL VENTA", "UTLIDAD"], ["A001", "2026-08-12T00:00:00", "agosto", 2026, "HUEVO CAMPESINO", 14000, 11000, 30, 420000, 90000]], "CLIENTES": [["CLIENTES"], ["ID_CLIENTE", "CLIENTE", "Cédula/NIT", "Teléfono", "Dirección", "Correo", "tienda"], [1, "dana", null, 3147215011, "belen de bajira", null, "fruver mando"], [2, "santiago", null, 3108997304, "belen de bajira", null, "fruver santiago"], [3, "edison", null, 3116836385, "belen de bajira", null, "merkafacil"], [4, "pablo cataño", null, 3124868347, "belen de bajira", null, "abarrote salome"], [5, "andrea cataño", null, 3042421702, "belen de bajira"], [6, "barata", null, 3215001783, "belen de bajira", null, "la mas barata"], [7, "paola", null, 3152542595, "belen de bajira", null, "insumos de panaderia"], [8, "pindy", null, 3104411621, "belen de bajira", null, "panadaria pindy"], [9, "salon", null, 3016584223, "belen de bajira", null, "tienda salon"], [10, "jose ortiz", null, 3106028709, "belen de bajira", null, "tienda amarilla"], [11, "ivan", null, null, "brisas del rio", null, "tienda ivan"], [12, "michel", null, 3147250038, "brisas del rio", null, "tienda michel"], [13, "baticano", null, null, "casa negra", null, "el baticano"], [14, "maria", null, 3103729921, "no hay como dios", null, "tienda maria"], [15, "silvia", null, 3207696966, "casa negra", null, "tienda solo dios"], [16, "enrrique", null, 3137530368, "no hay como dios", null, " tienda ahorro max"], [17, "alexis", null, 3117498749, "no hay como dios", null, "tienda"], [null, null, null, null, "llano rico", null, "tienda  DyD"]], "FACTURA VENTA": [[null, null, "DISTRIHUEVOS BONANZA", null, null, null, "FACTURA DE VENTA"], [null, null, "NIT:", null, null, null, "Factura No.:", 1], [null, null, "Dirección:", "cl29c#110-53", null, null, "Fecha:", "2026-08-12T00:00:00"], [null, null, "Teléfono:", "2325353324r", null, null, "Hora:", "14:59:42"], [null, null, null, null, null, null, "Fecha de vencimiento:", "2026-08-12T00:00:00"], ["INFORMACIÓN DEL CLIENTE"], ["Cliente", "pindy", null, null, "Cédula/NIT"], ["Teléfono", 3104411621, null, null, "Dirección", null, "belen de bajira"], ["Correo"], ["Código", "Producto", "Cantidad", "Precio Unit.", "Descuento", "Total", "INFORMACIÓN DE PAGO", null, "TOTAL PAGO"], ["A001", "HUEVO CAMPESINO", 30, 14000, null, 420000, "Total Factura", null, 420000], [null, null, null, null, null, null, "Pago Contado", null, "=I13"], [null, null, null, null, null, null, "Pago Crédito "], [null, null, null, null, null, null, "Días Crédito", null, 0], ["Observaciones", null, null, null, null, "Entregado por"], ["Firma Cliente"]], "FACTURAS & ABONOS VENTAS": [["FACTURAS VENTAS", null, null, null, null, null, null, null, null, null, null, null, null, "ABONOS"], [null, null, null, null, null, null, null, "TOTAL CARTERA ", "=SUM(I4:I100000)", "TOTAL CARTERA VENCIDA", "=SUMIF(J4:J100000,\"VENCIDA\",I4:I100000)"], ["ID_CLIENTE", "CLIENTE", "N_FACTURA", "CONDICION", "FECHA _FACTURA", "IMPORTE", "FECHA_VENCIMIENTO", "PAGO", "SALDO", "ESTADO", "DIAS", "RANGO", null, "FECHA", "FACTURA ", "MONTO", null, null, null, null, "CONDICION", null, null, "AGING"], [null, "pindy", 1, "CONTADO", "2026-08-12T00:00:00", 420000, "2026-08-12T00:00:00", 420000, 0, "CANCELADO", "-", null, null, "2026-08-12T00:00:00", 1, 420000, null, null, null, null, "CONDICION", "DIAS", null, "DIAS", "RANGO", "KPI"], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "CONTADO", 0, null, -99999, "A VENCER", 0], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "8 DIAS", 8, null, 0, "00-8", 1], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "15 DIAS", 15, null, 9, "00-15", 2]], "FACTURA COMPRA": [[null, null, "DISTRIHUEVOS BONANZA", null, null, null, "FACTURA DE COMPRA"], [null, null, "NIT:", null, null, null, "Factura No.:", 1], [null, null, "Dirección:", "cl29c#110-53", null, null, "Fecha:", "2026-08-12T00:00:00"], [null, null, "Teléfono:", "2325353324r", null, null, "Hora:", "14:59:03"], [null, null, null, null, null, null, "Fecha de vencimiento:", "2026-08-12T00:00:00"], ["INFORMACIÓN DEL PROVEEDOR"], ["PROVEEDOR", "MARTIN", null, null, "Cédula/NIT", null, 1020], ["Teléfono", 787098708, null, null, "Dirección", null, 8769768876], ["Correo", "MERTIN20@GMAIL.COM"], ["Código", "Producto", "Cantidad", "Precio Unit.", "Descuento", "Total", "FECHA DE VENCIMIENTO", "INFORMACIÓN DE PAGO", "TOTAL PAGO"], ["A001", "HUEVO CAMPESINO", 50, 11000, null, 550000, "=EDATE(H3,1)", "Total Factura", 550000], [null, null, null, null, null, null, null, "Pago Contado", "=I13"], [null, null, null, null, null, null, null, "Pago Crédito"], [null, null, null, null, null, null, null, "Días Crédito", 0], ["Observaciones", null, null, null, null, "Entregado por"], ["Firma Cliente"]], "LOTES": [["LOTES DE INVENTARIO"], ["N_LOTE", "CODIGO", "NOMBRE DEL PRODUCTO", "N_FACTURA_COMPRA", "FECHA_COMPRA", "CANTIDAD", "FECHA_VENCIMIENTO", "DIAS_PARA_VENCER", "ESTADO", "CANTIDAD_DISPONIBLE"], [2, "A001", "HUEVO CAMPESINO", 1, "2026-08-12T00:00:00", 50, "2026-09-12T00:00:00", 31, "VIGENTE", 20]], "FACTURAS & ABONOS COMPRA": [["FACTURAS COMPRA", null, null, null, null, null, null, null, null, null, null, null, null, "ABONOS"], [null, null, null, null, null, null, null, "TOTAL CARTERA ", "=SUM(I4:I100000)", "TOTAL CARTERA VENCIDA", "=SUMIF(J4:J100000,\"VENCIDA\",I4:I100000)"], ["ID_PROVEEDOR", "PROVEEDOR", "N_FACTURA", "CONDICION", "FECHA _FACTURA", "IMPORTE", "FECHA_VENCIMIENTO", "PAGO", "SALDO", "ESTADO", "DIAS", "RANGO", null, "FECHA", "FACTURA", "MONTO", null, null, null, null, "CONDICION", null, null, "AGING"], [null, null, null, null, null, null, null, null, null, null, null, null, null, "2026-08-11T00:00:00", 4, 440000, null, null, null, null, "CONDICION", "DIAS", null, "DIAS", "RANGO", "KPI"], [null, null, null, null, null, null, null, null, null, null, null, null, null, "2026-08-12T00:00:00", 5, 440000, null, null, null, null, "CONTADO", 0, null, -99999, "A VENCER", 0], [null, "MARTIN", 1, "CONTADO", "2026-08-12T00:00:00", 550000, "2026-08-12T00:00:00", 550000, 0, "CANCELADO", "-", null, null, "2026-08-12T00:00:00", 5, 440000, null, null, null, null, "8 DIAS", 8, null, 0, "00-8", 1], [null, null, null, null, null, null, null, null, null, null, null, null, null, "2026-08-12T00:00:00", 1, 550000, null, null, null, null, "15 DIAS", 15, null, 9, "00-15", 2]], "PROVEEDORES": [["proveedores"], ["ID_PROVEEDOR", "PROVEEDOR", "Cédula/NIT", "Teléfono", "Dirección", "Correo"], ["PV001", "ROGELIO", 1030, 608098860, 87956978518, "ESTEBAN30@GMAIL.COM"], ["PV002", "MARTIN", 1020, 787098708, 8769768876, "MERTIN20@GMAIL.COM"], ["PV003", "OSCAR", 1012, 87809089, 9890889807, "OSCAR34@GMAIL.COM"]]};
+const KEY='DISTRIHUEVOS BONANZA_EXACT_2026';
+let DB=JSON.parse(localStorage.getItem(KEY)||'null')||structuredClone(INITIAL);
+
+// Corrige en datos ya guardados las fórmulas viejas que dependían de "Tablas" de Excel
+// que el exportador no incluye, y que por eso salían en error (#VALUE!/#N/A) al abrir
+// el archivo exportado. Se reemplazan por fórmulas de rango equivalentes.
+function fixLegacyFormulas(){
+  const fix=(sheet,rowIdx,colIdx,oldFrag,newVal)=>{
+    const rows=DB[sheet]; if(!rows||!rows[rowIdx]) return;
+    const cell=rows[rowIdx][colIdx];
+    if(typeof cell==='string' && cell.includes(oldFrag)) rows[rowIdx][colIdx]=newVal;
+  };
+  fix('GASTOS',1,3,'Tabla21','=SUM(E4:E100000)');
+  fix('INVENTARIO',2,7,'INVENTARIO[','=SUBTOTAL(9,G5:G100000)');
+  fix('COMPRAS',2,7,'COMPRAS[','=SUBTOTAL(9,H5:H100000)');
+  fix('VENTAS',2,8,'VENTAS[','=SUBTOTAL(9,I5:I100000)');
+  fix('VENTAS',2,9,'VENTAS[','=SUBTOTAL(9,J5:J100000)');
+  fix('FACTURAS & ABONOS VENTAS',1,8,'FACTURA[','=SUM(I4:I100000)');
+  fix('FACTURAS & ABONOS VENTAS',1,10,'FACTURA[','=SUMIF(J4:J100000,"VENCIDA",I4:I100000)');
+  fix('FACTURAS & ABONOS COMPRA',1,8,'FACTURACOMPRA[','=SUM(I4:I100000)');
+  fix('FACTURAS & ABONOS COMPRA',1,10,'FACTURACOMPRA[','=SUMIF(J4:J100000,"VENCIDA",I4:I100000)');
+  for(const sheet of ['FACTURA VENTA','FACTURA COMPRA']){
+    const rows=DB[sheet]; if(!rows||!rows[0]) continue;
+    if(rows[0][0]==='#VALUE!') rows[0][0]=null;
+  }
+}
+fixLegacyFormulas();
+
+// Relaciona cada línea de COMPRAS/VENTAS con su N° de factura sin alterar
+// las columnas originales del Excel: el N° de factura se guarda como última columna.
+function ensureInvoiceLinks(){
+  for(const sheet of ['COMPRAS','VENTAS']){
+    const rs=DB[sheet]||[];
+    if(!rs.length) continue;
+    const header=rs.find(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()===sheet);
+    // En estas hojas el encabezado real es la fila que contiene CODIGO.
+    const hi=rs.findIndex(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()==='CODIGO');
+    if(hi<0) continue;
+    if(String(rs[hi][rs[hi].length-1]??'').toUpperCase()!=='N_FACTURA') rs[hi].push('N_FACTURA');
+    const portfolio=sheet==='VENTAS'?(DB['FACTURAS & ABONOS VENTAS']||[]):(DB['FACTURAS & ABONOS COMPRA']||[]);
+    const used=new Set();
+    for(let i=hi+1;i<rs.length;i++){
+      const row=rs[i]; if(!row||!row[0]) continue;
+      if(row.length<rs[hi].length) row.push('');
+      if(row[rs[hi].length-1]) continue;
+      const fecha=String(row[1]??'').slice(0,10);
+      const total=num(sheet==='VENTAS'?row[8]:row[7]);
+      let match=-1;
+      for(let j=1;j<portfolio.length;j++){
+        const pr=portfolio[j];
+        const pf=String(pr?.[4]??'').slice(0,10), pi=num(pr?.[2]), pt=num(pr?.[5]);
+        if(!used.has(pi) && pf===fecha && pt===total){match=j;break;}
+      }
+      if(match<0){
+        const nums=portfolio.slice(1).map(r=>num(r?.[2])).filter(Boolean);
+        const fallback=nums[i-hi-1];
+        if(fallback) row[rs[hi].length-1]=fallback;
+      } else { row[rs[hi].length-1]=portfolio[match][2]; used.add(num(portfolio[match][2])); }
+    }
+  }
+}
+ensureInvoiceLinks();
+
+// Sincronización central: COMPRAS y VENTAS son las fuentes de movimiento del inventario.
+function normalizeInventory(){
+  const header=['CODIGO','NOMBRE DEL PRODUCTO','COMPRAS','VENTAS','STOCK','COSTO UNITARIO','VALOR DEL INVENTARIO'];
+  const products=(DB['BASE DE DATOS DE PRODUCTOS']||[]).slice(2).filter(r=>r&&r[0]);
+  const purchaseRows=(DB['COMPRAS']||[]).slice(4).filter(r=>r&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO');
+  const saleRows=(DB['VENTAS']||[]).slice(4).filter(r=>r&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO');
+  const old=(DB['INVENTARIO']||[]).filter(r=>r&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO');
+  const oldMap=new Map(old.map(r=>[String(r[0]),r]));
+  const out=[['INVENTARIO'],[null,null,null,null,null,null,null,'TOTAL INVENTARIO'],[null,null,null,null,null,null,null,'=SUBTOTAL(9,G5:G100000)'],header];
+  products.forEach(pr=>{
+    const code=String(pr[0]),name=String(pr[1]||'');
+    const qCompra=purchaseRows.filter(r=>String(r[0])===code).reduce((a,r)=>a+num(r[6]),0);
+    const qVenta=saleRows.filter(r=>String(r[0])===code).reduce((a,r)=>a+num(r[7]),0);
+    const oldr=oldMap.get(code);
+    let cost=0;
+    const last=purchaseRows.filter(r=>String(r[0])===code).at(-1);
+    if(last) cost=num(last[5]); else if(oldr) cost=num(oldr[5]);
+    const compras=qCompra; const ventas=qVenta; const stock=compras-ventas;
+    out.push([code,name,compras,ventas,stock,cost,stock*cost]);
+  });
+  DB['INVENTARIO']=out;
+}
+normalizeInventory();
+save();
+const sheets=['MENU','GASTOS','FLUJO DE CAJA','BASE DE DATOS DE PRODUCTOS','INVENTARIO','COMPRAS','VENTAS','CLIENTES','FACTURA VENTA','FACTURAS & ABONOS VENTAS','FACTURA COMPRA','LOTES','FACTURAS & ABONOS COMPRA','PROVEEDORES'];
+const navMap={menu:'MENU',gastos:'GASTOS',flujo:'FLUJO DE CAJA',productos:'BASE DE DATOS DE PRODUCTOS',inventario:'INVENTARIO',compras:'COMPRAS',ventas:'VENTAS',clientes:'CLIENTES',facturaventa:'FACTURA VENTA',carteraventa:'FACTURAS & ABONOS VENTAS',facturacompra:'FACTURA COMPRA',lotes:'LOTES',carteracompra:'FACTURAS & ABONOS COMPRA',proveedores:'PROVEEDORES'};
+function save(){localStorage.setItem(KEY,JSON.stringify(DB));}
+function toast(s){let e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+function openModal(html){document.getElementById('modalbody').innerHTML=html;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function money(v){return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(v)||0)}
+function num(v){return Number(String(v??'').replace(/[^0-9.-]/g,''))||0}
+
+/* ===================== AUTENTICACIÓN ===================== */
+const AUTH_KEY='DISTRIHUEVOS_AUTH_V1';
+const SESSION_KEY='DISTRIHUEVOS_SESSION_V1';
+const LOGO_DATA=document.querySelector('.top img').src;
+function getAuth(){try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'null')}catch(e){return null}}
+function setAuth(a){localStorage.setItem(AUTH_KEY,JSON.stringify(a))}
+function isLoggedIn(){return sessionStorage.getItem(SESSION_KEY)==='1'}
+
+function authShell(title,bodyHtml){
+  return '<div class="auth-wrap"><div class="auth-box"><div class="auth-logo"><img src="'+LOGO_DATA+'" alt="logo"><b>DISTRIHUEVOS BONANZA</b><small>Huevos y Gallinas</small></div><div class="auth-title">'+esc(title)+'</div>'+bodyHtml+'</div></div>';
+}
+
+function renderAuthScreen(){
+  const root=document.getElementById('authScreen');
+  const auth=getAuth();
+  if(!auth){ root.innerHTML=setupFormHTML(); wireSetupForm(); }
+  else{ root.innerHTML=loginFormHTML(); wireLoginForm(); }
+}
+
+function setupFormHTML(err){
+  return authShell('Crea tu acceso', (err?'<div class="auth-error">'+esc(err)+'</div>':'')+
+    '<div class="auth-hint">Configura el usuario y la contraseña con los que entrarás a la app. El correo y la pregunta de seguridad se usan solo para ayudarte a recuperar el acceso si olvidas la contraseña; esta app no envía correos reales, todo queda guardado en este dispositivo.</div>'+
+    '<form id="setupForm">'+
+    '<div class="auth-field"><label>Usuario</label><input id="su_user" required autocomplete="username"></div>'+
+    '<div class="auth-field"><label>Contraseña</label><input id="su_pass" type="password" required autocomplete="new-password"></div>'+
+    '<div class="auth-field"><label>Confirmar contraseña</label><input id="su_pass2" type="password" required autocomplete="new-password"></div>'+
+    '<div class="auth-field"><label>Correo de recuperación</label><input id="su_email" type="email" required autocomplete="email"></div>'+
+    '<div class="auth-field"><label>Pregunta de seguridad</label><input id="su_q" placeholder="Ej: ¿Nombre de tu primera mascota?" required></div>'+
+    '<div class="auth-field"><label>Respuesta</label><input id="su_a" required></div>'+
+    '<div class="auth-actions"><button class="btn" type="submit">Crear acceso</button></div>'+
+    '</form>');
+}
+
+function wireSetupForm(){
+  document.getElementById('setupForm').onsubmit=function(e){
+    e.preventDefault();
+    const user=document.getElementById('su_user').value.trim();
+    const pass=document.getElementById('su_pass').value;
+    const pass2=document.getElementById('su_pass2').value;
+    const email=document.getElementById('su_email').value.trim();
+    const q=document.getElementById('su_q').value.trim();
+    const a=document.getElementById('su_a').value.trim();
+    if(!user||!pass||!email||!q||!a){document.getElementById('authScreen').innerHTML=setupFormHTML('Completa todos los campos.');wireSetupForm();return}
+    if(pass!==pass2){document.getElementById('authScreen').innerHTML=setupFormHTML('Las contraseñas no coinciden.');wireSetupForm();return}
+    if(pass.length<4){document.getElementById('authScreen').innerHTML=setupFormHTML('La contraseña debe tener al menos 4 caracteres.');wireSetupForm();return}
+    setAuth({usuario:user,pass:pass,email:email,pregunta:q,respuesta:a.toLowerCase()});
+    sessionStorage.setItem(SESSION_KEY,'1');
+    enterApp();
+  };
+}
+
+function loginFormHTML(err,okMsg){
+  const auth=getAuth();
+  return authShell('Iniciar sesión', (err?'<div class="auth-error">'+esc(err)+'</div>':'')+(okMsg?'<div class="auth-ok">'+esc(okMsg)+'</div>':'')+
+    '<form id="loginForm">'+
+    '<div class="auth-field"><label>Usuario</label><input id="li_user" required autocomplete="username" value="'+esc(auth?auth.usuario:'')+'"></div>'+
+    '<div class="auth-field"><label>Contraseña</label><input id="li_pass" type="password" required autocomplete="current-password"></div>'+
+    '<div class="auth-actions"><button class="btn" type="submit">Ingresar</button>'+
+    '<button type="button" class="auth-link" onclick="startRecovery()">¿Olvidaste tu contraseña?</button></div>'+
+    '</form>');
+}
+
+function wireLoginForm(){
+  document.getElementById('loginForm').onsubmit=function(e){
+    e.preventDefault();
+    const auth=getAuth();
+    const user=document.getElementById('li_user').value.trim();
+    const pass=document.getElementById('li_pass').value;
+    if(!auth||user!==auth.usuario||pass!==auth.pass){
+      document.getElementById('authScreen').innerHTML=loginFormHTML('Usuario o contraseña incorrectos.');
+      wireLoginForm();
+      return;
+    }
+    sessionStorage.setItem(SESSION_KEY,'1');
+    enterApp();
+  };
+}
+
+function startRecovery(){
+  document.getElementById('authScreen').innerHTML=recoveryStep1HTML();
+  wireRecoveryStep1();
+}
+
+function recoveryStep1HTML(err){
+  return authShell('Recuperar acceso', (err?'<div class="auth-error">'+esc(err)+'</div>':'')+
+    '<div class="auth-hint">Escribe el correo de recuperación que registraste. No se enviará ningún correo: si coincide, te haremos la pregunta de seguridad para confirmar que eres tú.</div>'+
+    '<form id="recForm1">'+
+    '<div class="auth-field"><label>Correo de recuperación</label><input id="rc_email" type="email" required autocomplete="email"></div>'+
+    '<div class="auth-actions"><button class="btn" type="submit">Continuar</button>'+
+    '<button type="button" class="auth-link" onclick="renderAuthScreen()">Volver a iniciar sesión</button></div>'+
+    '</form>');
+}
+
+function wireRecoveryStep1(){
+  document.getElementById('recForm1').onsubmit=function(e){
+    e.preventDefault();
+    const auth=getAuth();
+    const email=document.getElementById('rc_email').value.trim().toLowerCase();
+    if(!auth||email!==auth.email.toLowerCase()){
+      document.getElementById('authScreen').innerHTML=recoveryStep1HTML('Ese correo no coincide con el registrado.');
+      wireRecoveryStep1();
+      return;
+    }
+    document.getElementById('authScreen').innerHTML=recoveryStep2HTML();
+    wireRecoveryStep2();
+  };
+}
+
+function recoveryStep2HTML(err){
+  const auth=getAuth();
+  return authShell('Pregunta de seguridad', (err?'<div class="auth-error">'+esc(err)+'</div>':'')+
+    '<div class="auth-hint">'+esc(auth.pregunta)+'</div>'+
+    '<form id="recForm2">'+
+    '<div class="auth-field"><label>Respuesta</label><input id="rc_answer" required></div>'+
+    '<div class="auth-actions"><button class="btn" type="submit">Verificar</button>'+
+    '<button type="button" class="auth-link" onclick="renderAuthScreen()">Volver a iniciar sesión</button></div>'+
+    '</form>');
+}
+
+function wireRecoveryStep2(){
+  document.getElementById('recForm2').onsubmit=function(e){
+    e.preventDefault();
+    const auth=getAuth();
+    const ans=document.getElementById('rc_answer').value.trim().toLowerCase();
+    if(ans!==auth.respuesta){
+      document.getElementById('authScreen').innerHTML=recoveryStep2HTML('Respuesta incorrecta.');
+      wireRecoveryStep2();
+      return;
+    }
+    document.getElementById('authScreen').innerHTML=recoveryStep3HTML();
+    wireRecoveryStep3();
+  };
+}
+
+function recoveryStep3HTML(err){
+  return authShell('Crear nueva contraseña', (err?'<div class="auth-error">'+esc(err)+'</div>':'')+
+    '<form id="recForm3">'+
+    '<div class="auth-field"><label>Nueva contraseña</label><input id="rc_pass" type="password" required autocomplete="new-password"></div>'+
+    '<div class="auth-field"><label>Confirmar nueva contraseña</label><input id="rc_pass2" type="password" required autocomplete="new-password"></div>'+
+    '<div class="auth-actions"><button class="btn" type="submit">Guardar nueva contraseña</button></div>'+
+    '</form>');
+}
+
+function wireRecoveryStep3(){
+  document.getElementById('recForm3').onsubmit=function(e){
+    e.preventDefault();
+    const pass=document.getElementById('rc_pass').value;
+    const pass2=document.getElementById('rc_pass2').value;
+    if(pass.length<4){document.getElementById('authScreen').innerHTML=recoveryStep3HTML('La contraseña debe tener al menos 4 caracteres.');wireRecoveryStep3();return}
+    if(pass!==pass2){document.getElementById('authScreen').innerHTML=recoveryStep3HTML('Las contraseñas no coinciden.');wireRecoveryStep3();return}
+    const auth=getAuth();
+    auth.pass=pass;
+    setAuth(auth);
+    document.getElementById('authScreen').innerHTML=loginFormHTML(null,'Contraseña actualizada. Ya puedes iniciar sesión.');
+    wireLoginForm();
+  };
+}
+
+function enterApp(){
+  document.getElementById('authScreen').innerHTML='';
+  document.getElementById('appRoot').style.display='';
+  document.getElementById('clock').textContent=new Date().toLocaleString('es-CO');
+  show('menu');
+}
+
+function logout(){
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('appRoot').style.display='none';
+  renderAuthScreen();
+}
+
+function openAccountModal(){
+  const auth=getAuth();
+  openModal('<h2>Mi cuenta</h2>'+
+    '<div class="auth-hint">Actualiza tus datos de acceso. La contraseña y la respuesta de seguridad no se muestran por seguridad.</div>'+
+    '<form id="accForm" class="form">'+
+    '<div class="field full"><label>Usuario</label><input id="ac_user" value="'+esc(auth.usuario)+'" required></div>'+
+    '<div class="field full"><label>Correo de recuperación</label><input id="ac_email" type="email" value="'+esc(auth.email)+'" required></div>'+
+    '<div class="field full"><label>Pregunta de seguridad</label><input id="ac_q" value="'+esc(auth.pregunta)+'" required></div>'+
+    '<div class="field full"><label>Nueva respuesta de seguridad (déjalo vacío para no cambiarla)</label><input id="ac_a"></div>'+
+    '<div class="field full"><label>Nueva contraseña (déjalo vacío para no cambiarla)</label><input id="ac_pass" type="password"></div>'+
+    '<div class="field full"><label>Confirmar nueva contraseña</label><input id="ac_pass2" type="password"></div>'+
+    '<div class="field full actions"><button class="btn" type="submit">Guardar cambios</button></div>'+
+    '</form>');
+  document.getElementById('accForm').onsubmit=function(e){
+    e.preventDefault();
+    const user=document.getElementById('ac_user').value.trim();
+    const email=document.getElementById('ac_email').value.trim();
+    const q=document.getElementById('ac_q').value.trim();
+    const a=document.getElementById('ac_a').value.trim();
+    const pass=document.getElementById('ac_pass').value;
+    const pass2=document.getElementById('ac_pass2').value;
+    if(!user||!email||!q){toast('Completa usuario, correo y pregunta de seguridad');return}
+    if(pass||pass2){
+      if(pass.length<4){toast('La nueva contraseña debe tener al menos 4 caracteres');return}
+      if(pass!==pass2){toast('Las contraseñas no coinciden');return}
+      auth.pass=pass;
+    }
+    auth.usuario=user; auth.email=email; auth.pregunta=q;
+    if(a) auth.respuesta=a.toLowerCase();
+    setAuth(auth);
+    toast('Datos de cuenta actualizados');
+    closeModal();
+  };
+}
+/* =================== FIN AUTENTICACIÓN =================== */
+function date(v){if(!v)return '';let d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString('es-CO')}
+function iso(d){return new Date(d).toISOString().slice(0,10)}
+function headers(rows){return rows[0]||[]}
+function rows(name){return DB[name]||[]}
+function table(name,limit=500){let rs=rows(name); if(!rs.length)return '<div class="empty">Sin registros.</div>';let h=headers(rs);return `<div class="tablewrap"><table class="tbl"><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${rs.slice(1,limit+1).map((r,i)=>`<tr>${h.map((_,j)=>`<td>${esc(r[j]??'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function setNav(active){document.getElementById('nav').innerHTML=Object.entries(navMap).map(([k,v])=>`<button class="${active===k?'active':''}" onclick="show('${k}')">${icon(k)} ${v}</button>`).join('')}
+function icon(k){return {menu:'🏠',gastos:'💸',flujo:'💰',productos:'🥚',inventario:'📦',compras:'🛒',ventas:'💵',clientes:'👥',facturaventa:'🧾',carteraventa:'📒',facturacompra:'🧾',lotes:'📅',carteracompra:'📒',proveedores:'🚚'}[k]||'•'}
+function show(k){setNav(k);let c=document.getElementById('content'); if(k==='menu')return renderMenu(c); if(k==='productos')return renderProducts(c);if(k==='clientes')return renderPeople(c,'CLIENTES');if(k==='proveedores')return renderPeople(c,'PROVEEDORES');if(k==='inventario')return renderInventory(c);if(k==='compras')return renderPurchase(c);if(k==='ventas')return renderSale(c);if(k==='gastos')return renderExpense(c);if(k==='flujo')return renderFlow(c);if(k==='lotes')return renderLots(c);if(k==='facturaventa')return renderInvoice(c,'venta');if(k==='facturacompra')return renderInvoice(c,'compra');if(k==='carteraventa')return renderPortfolio(c,'venta');if(k==='carteracompra')return renderPortfolio(c,'compra');c.innerHTML=`<div class="title">${esc(navMap[k])}</div><div class="sub">Vista fiel de la hoja del Excel.</div>${table(navMap[k])}`}
+function renderMenu(c){let inv=calcInv(),sales=calcSales(),purchases=calcPurchases(),cv=calcPortfolio('venta'),cc=calcPortfolio('compra');c.innerHTML=`<div class="title">MENU</div><div class="sub">Panel principal basado en las hojas del libro DISTRIHUEVOS BONANZA.</div><div class="cards"><div class="card metric"><span>Inventario</span><b>${money(inv.value)}</b></div><div class="card metric"><span>Ventas</span><b>${money(sales.total)}</b></div><div class="card metric"><span>Compras</span><b>${money(purchases.total)}</b></div><div class="card metric"><span>Cartera ventas</span><b>${money(cv.balance)}</b></div></div><div class="card" style="margin-top:12px"><h3>Hojas del Excel</h3><div class="actions">${Object.entries(navMap).filter(([k])=>k!=='menu').map(([k,v])=>`<button class="btn alt" onclick="show('${k}')">${icon(k)} ${v}</button>`).join('')}</div><p class="hint">La aplicación usa la misma estructura de hojas, nombres de campos y reglas de contado/crédito del archivo suministrado.</p></div>`}
+function calcInv(){let h=headers(rows('INVENTARIO')),rs=rows('INVENTARIO').slice(1);let value=rs.reduce((s,r)=>s+num(r[6]),0);return {value,rows:rs}}
+function calcSales(){let rs=rows('VENTAS').slice(1);return {total:rs.reduce((s,r)=>s+num(r[8]),0),profit:rs.reduce((s,r)=>s+num(r[9]),0)}}
+function calcPurchases(){let rs=rows('COMPRAS').slice(1);return {total:rs.reduce((s,r)=>s+num(r[7]),0)}}
+function productsRows(){return (DB['BASE DE DATOS DE PRODUCTOS']||[]).slice(2).filter(r=>r&&r[0])}
+function nextProductCode(){
+  let max=0,width=3;
+  productsRows().forEach(r=>{
+    const m=String(r[0]||'').match(/^A(\d+)$/i);
+    if(m){const n=parseInt(m[1],10);if(n>=max){max=n;width=m[1].length}}
+  });
+  return 'A'+String(max+1).padStart(width,'0');
+}
+function renderProducts(c){
+  const list=productsRows();
+  c.innerHTML=`<div class="title">LISTA DE PRODUCTOS</div><div class="sub">Productos disponibles para compras, ventas e inventario.</div>
+  <div class="tablewrap"><table class="tbl"><thead><tr><th>CÓDIGO</th><th>NOMBRE DEL PRODUCTO</th><th></th></tr></thead><tbody>${list.length?list.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="actions"><button class="btn alt" onclick="editProduct('${esc(r[0])}')">Editar</button><button class="btn danger" onclick="deleteProduct('${esc(r[0])}')">Eliminar</button></td></tr>`).join(''):'<tr><td colspan="3" class="empty">Sin productos.</td></tr>'}</tbody></table></div>
+  <div class="card" style="margin-top:14px"><h3>Nuevo producto</h3><form class="form" onsubmit="addProduct(event)"><div class="field"><label>Código (automático)</label><input id="pc" value="${nextProductCode()}" readonly></div><div class="field"><label>Nombre</label><input id="pn" required></div><div class="full actions"><button class="btn">Guardar producto</button></div></form></div>`;
+}
+function editProduct(code){
+  const item=productsRows().find(r=>String(r[0])===String(code));
+  if(!item) return;
+  openModal(`<h3>Editar producto</h3><form class="form" onsubmit="saveProductEdit(event,'${esc(code)}')"><div class="field"><label>Código</label><input value="${esc(code)}" disabled></div><div class="field"><label>Nombre</label><input id="epn" value="${esc(item[1]??'')}" required></div><div class="full actions"><button class="btn">Guardar cambios</button><button class="btn alt" type="button" onclick="closeModal()">Cancelar</button></div></form>`);
+}
+function saveProductEdit(e,code){
+  e.preventDefault();
+  const name=epn.value.trim();
+  if(!name) return toast('Escribe el nombre');
+  const list=DB['BASE DE DATOS DE PRODUCTOS'];
+  const idx=list.findIndex((r,i)=>i>=2 && r && String(r[0])===String(code));
+  if(idx<0) return;
+  list[idx][1]=name;
+  normalizeInventory();
+  save();
+  closeModal();
+  toast('Producto actualizado');
+  show('productos');
+}
+function addProduct(e){
+  e.preventDefault();
+  const code=nextProductCode(),name=pn.value.trim();
+  if(!name) return toast('Escribe el nombre del producto');
+  if(productsRows().some(r=>String(r[0]).toUpperCase()===code.toUpperCase())) return toast('Ese código ya existe, intenta de nuevo');
+  DB['BASE DE DATOS DE PRODUCTOS'].push([code,name]);
+  normalizeInventory();
+  save();
+  toast(`Producto ${code} guardado`);
+  show('productos');
+}
+function deleteProduct(code){
+  const enCompras=(DB['COMPRAS']||[]).slice(4).some(r=>r&&String(r[0])===String(code));
+  const enVentas=(DB['VENTAS']||[]).slice(4).some(r=>r&&String(r[0])===String(code));
+  const msg=(enCompras||enVentas)
+    ?'Este producto ya tiene compras o ventas registradas. Si lo eliminas, se conservará el historial pero ya no podrás usarlo en nuevas operaciones. ¿Eliminar de todas formas?'
+    :'¿Eliminar este producto?';
+  if(!confirm(msg)) return;
+  const list=DB['BASE DE DATOS DE PRODUCTOS'];
+  const idx=list.findIndex((r,i)=>i>=2 && r && String(r[0])===String(code));
+  if(idx>=0) list.splice(idx,1);
+  normalizeInventory();
+  save();
+  toast('Producto eliminado');
+  show('productos');
+}
+function nextClientId(){
+  const ids=rows('CLIENTES').slice(2).map(r=>num(r[0])).filter(n=>n>0);
+  return (ids.length?Math.max(...ids):0)+1;
+}
+function nextProviderCode(){
+  let max=0,width=3,prefix='PV';
+  rows('PROVEEDORES').slice(2).forEach(r=>{
+    const m=String(r[0]||'').match(/^([A-Za-z]+)(\d+)$/);
+    if(m){const n=parseInt(m[2],10);if(n>=max){max=n;width=m[2].length;prefix=m[1]}}
+  });
+  return prefix+String(max+1).padStart(width,'0');
+}
+function renderPeople(c,name){
+  const isC=name==='CLIENTES';
+  const full=rows(name);
+  const items=[];
+  full.forEach((r,i)=>{ if(i>=2 && r && r[1]) items.push({idx:i,r}); });
+  const cols=isC?['ID','CLIENTE','CÉDULA/NIT','TELÉFONO','DIRECCIÓN','CORREO','TIENDA']:['ID','PROVEEDOR','CÉDULA/NIT','TELÉFONO','DIRECCIÓN','CORREO'];
+  c.innerHTML=`<div class="title">${name}</div><div class="sub">Estructura tomada directamente del Excel.</div>
+  <div class="actions" style="margin-bottom:12px"><button class="btn" onclick="newPerson('${name}')">+ Nuevo ${isC?'cliente':'proveedor'}</button></div>
+  <div class="tablewrap"><table class="tbl"><thead><tr>${cols.map(h=>`<th>${h}</th>`).join('')}<th></th></tr></thead><tbody>${items.length?items.map(({idx,r})=>`<tr><td>${esc(r[0]??'')}</td><td>${esc(r[1]??'')}</td><td>${esc(r[2]??'')}</td><td>${esc(r[3]??'')}</td><td>${esc(r[4]??'')}</td><td>${esc(r[5]??'')}</td>${isC?`<td>${esc(r[6]??'')}</td>`:''}<td class="actions"><button class="btn alt" onclick="editPerson('${name}',${idx})">Editar</button><button class="btn danger" onclick="deletePerson('${name}',${idx})">Eliminar</button></td></tr>`).join(''):`<tr><td colspan="${cols.length+1}" class="empty">Sin registros.</td></tr>`}</tbody></table></div>`;
+}
+function newPerson(name){
+  const isC=name==='CLIENTES';
+  const nextId=isC?nextClientId():nextProviderCode();
+  openModal(`<h3>Nuevo ${isC?'cliente':'proveedor'}</h3><form class="form" onsubmit="addPerson(event,'${name}')"><div class="field"><label>ID (automático)</label><input id="idp" value="${nextId}" readonly></div><div class="field"><label>${isC?'Cliente':'Proveedor'}</label><input id="nomp" required></div><div class="field"><label>Cédula/NIT</label><input id="nitp"></div><div class="field"><label>Teléfono</label><input id="telp"></div><div class="field"><label>Dirección</label><input id="dirp"></div><div class="field"><label>Correo</label><input id="corp"></div>${isC?'<div class="field"><label>Tienda</label><input id="tiendap"></div>':''}<div class="full actions"><button class="btn">Guardar</button><button class="btn alt" type="button" onclick="closeModal()">Cancelar</button></div></form>`);
+}
+function editPerson(name,idx){
+  const r=DB[name][idx];
+  if(!r) return;
+  const isC=name==='CLIENTES';
+  openModal(`<h3>Editar ${isC?'cliente':'proveedor'}</h3><form class="form" onsubmit="savePersonEdit(event,'${name}',${idx})"><div class="field"><label>ID</label><input value="${esc(r[0]??'')}" disabled></div><div class="field"><label>${isC?'Cliente':'Proveedor'}</label><input id="enomp" value="${esc(r[1]??'')}" required></div><div class="field"><label>Cédula/NIT</label><input id="enitp" value="${esc(r[2]??'')}"></div><div class="field"><label>Teléfono</label><input id="etelp" value="${esc(r[3]??'')}"></div><div class="field"><label>Dirección</label><input id="edirp" value="${esc(r[4]??'')}"></div><div class="field"><label>Correo</label><input id="ecorp" value="${esc(r[5]??'')}"></div>${isC?`<div class="field"><label>Tienda</label><input id="etiendap" value="${esc(r[6]??'')}"></div>`:''}<div class="full actions"><button class="btn">Guardar cambios</button><button class="btn alt" type="button" onclick="closeModal()">Cancelar</button></div></form>`);
+}
+function savePersonEdit(e,name,idx){
+  e.preventDefault();
+  const isC=name==='CLIENTES';
+  const nom=enomp.value.trim();
+  if(!nom) return toast('Escribe el nombre');
+  const r=DB[name][idx];
+  if(!r) return;
+  r[1]=nom; r[2]=enitp.value; r[3]=etelp.value; r[4]=edirp.value; r[5]=ecorp.value;
+  if(isC) r[6]=etiendap.value;
+  save();
+  closeModal();
+  toast(`${isC?'Cliente':'Proveedor'} actualizado`);
+  show(isC?'clientes':'proveedores');
+}
+function addPerson(e,name){
+  e.preventDefault();
+  const isC=name==='CLIENTES';
+  const id=isC?nextClientId():nextProviderCode();
+  const nom=nomp.value.trim();
+  if(!nom) return toast('Escribe el nombre');
+  const dup=rows(name).slice(2).some(r=>r&&r[1]&&String(r[1]).toUpperCase()===nom.toUpperCase());
+  if(dup) return toast('Ya existe un registro con ese nombre');
+  const r=isC?[id,nom,nitp.value,telp.value,dirp.value,corp.value,tiendap.value]:[id,nom,nitp.value,telp.value,dirp.value,corp.value];
+  DB[name].push(r);
+  save();
+  closeModal();
+  toast(`${isC?'Cliente':'Proveedor'} ${id} guardado`);
+  show(isC?'clientes':'proveedores');
+}
+function deletePerson(name,idx){
+  const isC=name==='CLIENTES';
+  const r=DB[name][idx];
+  if(!r) return;
+  const nameVal=String(r[1]??'').trim().toUpperCase();
+  const cartera=isC?rows('FACTURAS & ABONOS VENTAS'):rows('FACTURAS & ABONOS COMPRA');
+  const enUso=cartera.slice(3).some(row=>row && String(row[1]??'').trim().toUpperCase()===nameVal);
+  const msg=enUso
+    ?`Este ${isC?'cliente':'proveedor'} ya tiene facturas registradas. Si lo eliminas, se conservará el historial pero ya no podrás seleccionarlo en nuevas operaciones. ¿Eliminar de todas formas?`
+    :`¿Eliminar este ${isC?'cliente':'proveedor'}?`;
+  if(!confirm(msg)) return;
+  DB[name].splice(idx,1);
+  save();
+  toast(`${isC?'Cliente':'Proveedor'} eliminado`);
+  show(isC?'clientes':'proveedores');
+}
+function productList(){return rows('INVENTARIO').slice(1).filter(r=>r[0]).map(r=>({code:r[0],name:r[1],stock:num(r[4]),cost:num(r[5])}))}
+function renderInventory(c){
+  const rs=DB['INVENTARIO']||[];
+  const hi=rs.findIndex(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()==='CODIGO'); const data=hi>=0?rs.slice(hi+1).filter(r=>r&&r[0]):[];
+  const total=data.reduce((s,r)=>s+num(r[6]),0);
+  c.innerHTML=`<div class="title">INVENTARIO</div><div class="sub">Compras, ventas, stock, costo unitario y valor del inventario.</div><div class="cards"><div class="card metric"><span>Total inventario</span><b>${money(total)}</b></div><div class="card metric"><span>Productos</span><b>${data.length}</b></div></div><div class="tablewrap" style="margin-top:12px"><table class="tbl"><thead><tr>${['CODIGO','NOMBRE DEL PRODUCTO','COMPRAS','VENTAS','STOCK','COSTO UNITARIO','VALOR DEL INVENTARIO'].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${data.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${num(r[2])}</td><td>${num(r[3])}</td><td><b>${num(r[4])}</b></td><td>${money(r[5])}</td><td>${money(r[6])}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function productOpts(){return productList().map(p=>`<option value="${esc(p.code)}">${esc(p.name)} (${esc(p.code)})</option>`).join('')}
+function clientOpts(){return rows('CLIENTES').slice(2).filter(r=>r[1]).map(r=>`<option value="${esc(r[1])}">${esc(r[1])}${r[6]?' — '+esc(r[6]):''}</option>`).join('')}
+function providerOpts(){return rows('PROVEEDORES').slice(2).filter(r=>r[1]).map(r=>`<option value="${esc(r[1])}">${esc(r[1])}</option>`).join('')}
+function creditSelect(id){return `<select id="${id}"><option value="0">CONTADO — 0 días</option><option value="8">8 DIAS</option><option value="15">15 DIAS</option></select>`}
+let saleCart=[],purchaseCart=[],editingSaleInvoice=null,editingPurchaseInvoice=null,saleCartEditIdx=null,purchaseCartEditIdx=null,currentView='menu';
+function renderSale(c){
+  c.innerHTML=`<div class="title">VENTAS / FACTURA DE VENTA</div><div class="sub">Una venta puede contener varios productos. Condiciones permitidas: contado, 8 o 15 días.</div><div class="actions" style="margin-bottom:12px"><button class="btn" onclick="openSaleForm()">+ Registrar venta</button></div><div class="card"><h3>Últimas ventas</h3>${salesHistoryTable()}</div>`;
+}
+function openSaleForm(){
+  let inv=editingSaleInvoice||nextInvoice('venta');
+  let editing=!!editingSaleInvoice;
+  openModal(`<h3>${editing?'Editar venta N° '+inv:'Registrar venta'}</h3><div class="form"><div class="field"><label>N° factura</label><input id="sinv" type="number" min="1" step="1" value="${inv}"></div><div class="field"><label>Cliente</label><select id="sclient"><option value="">Venta directa</option>${clientOpts()}</select></div><div class="field"><label>Condición</label>${creditSelect('scond')}</div><div class="field"><label>Fecha</label><input id="sdate" type="date" value="${iso(new Date())}"></div><div class="field"><label>Fecha de vencimiento</label><input id="screditvenc" type="text" readonly></div><div class="field"><label>Descuento</label><input id="sdisc" type="number" value="0" min="0"></div><div class="field"><label>Producto</label><select id="sprod">${productOpts()}</select></div><div class="field"><label>Cantidad</label><input id="sqty" type="number" min="1" value="1"></div><div class="field"><label>Precio unitario</label><input id="sprice" type="number" min="0"></div><div class="field actions" style="align-items:end"><button class="btn" type="button" onclick="addSaleItem()">+ Agregar producto</button></div></div><div id="salecart"></div><div class="actions"><button class="btn" id="saleSaveBtn" onclick="saveSale()">${editing?'Guardar cambios de la venta N° '+inv:'Registrar venta N° '+inv}</button><button class="btn alt" onclick="saleCart=[];editingSaleInvoice=null;saleCartEditIdx=null;closeModal();show('ventas')">${editing?'Cancelar edición':'Cancelar'}</button></div>`);
+  document.getElementById('sinv').oninput=()=>{let n=num(document.getElementById('sinv').value);document.getElementById('saleSaveBtn').textContent=(editingSaleInvoice?'Guardar cambios de la venta N° ':'Registrar venta N° ')+(n||'')};
+  const refreshSaleVenc=()=>{let d=new Date(document.getElementById('sdate').value+'T12:00:00');let cond=num(document.getElementById('scond').value);let venc=new Date(d);venc.setDate(venc.getDate()+cond);document.getElementById('screditvenc').value=date(venc)};
+  document.getElementById('sdate').onchange=refreshSaleVenc;
+  document.getElementById('scond').onchange=refreshSaleVenc;
+  document.getElementById('sprod').onchange=()=>{let p=productList().find(x=>x.code===sprod.value);sprice.value=p?p.cost:0};
+  document.getElementById('sprod').dispatchEvent(new Event('change'));
+  refreshSaleVenc();
+  if(editing){
+    const cv=(DB['FACTURAS & ABONOS VENTAS']||[]).find(r=>Array.isArray(r)&&num(r[2])===num(editingSaleInvoice));
+    if(cv){document.getElementById('sclient').value=cv[1]||'';document.getElementById('sdate').value=iso(cv[4]);document.getElementById('scond').value=cv[3]==='CONTADO'?0:num(cv[10]);refreshSaleVenc();}
+  }
+  drawSaleCart();
+}
+function addSaleItem(){let p=productList().find(x=>x.code===sprod.value),q=num(sqty.value),price=num(sprice.value);if(!p||q<1)return toast('Seleccione producto y cantidad');let used=saleCart.filter(x=>x.code===p.code).reduce((s,x)=>s+x.qty,0);if(q+used>p.stock)return toast('Stock insuficiente');saleCart.push({code:p.code,name:p.name,qty:q,price,total:q*price});drawSaleCart()}
+function drawSaleCart(){let el=document.getElementById('salecart');if(!el)return;let total=saleCart.reduce((s,x)=>s+x.total,0);el.innerHTML=`<h3>Detalle de venta</h3>${saleCart.length?`<div class="tablewrap"><table class="tbl"><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Total</th><th></th></tr>${saleCart.map((x,i)=>saleCartEditIdx===i?`<tr><td>${esc(x.code)}</td><td>${esc(x.name)}</td><td><input id="escqty" type="number" min="1" value="${x.qty}" style="width:70px"></td><td><input id="escprice" type="number" min="0" value="${x.price}" style="width:90px"></td><td>-</td><td class="actions"><button class="btn alt" onclick="saveSaleCartItem(${i})">Guardar</button><button class="btn" onclick="saleCartEditIdx=null;drawSaleCart()">Cancelar</button></td></tr>`:`<tr><td>${esc(x.code)}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${money(x.price)}</td><td>${money(x.total)}</td><td class="actions"><button class="btn alt" onclick="saleCartEditIdx=${i};drawSaleCart()">Editar</button><button class="btn danger" onclick="saleCart.splice(${i},1);drawSaleCart()">Eliminar</button></td></tr>`).join('')}</table></div>`:'<div class="empty">No hay productos agregados.</div>'}<div class="card" style="margin-top:10px"><b>Total venta: ${money(total)}</b></div>`}
+function saveSaleCartItem(i){
+  const item=saleCart[i];
+  if(!item) return;
+  const q=num(document.getElementById('escqty').value);
+  const price=num(document.getElementById('escprice').value);
+  if(q<1) return toast('La cantidad debe ser mayor a 0.');
+  const p=productList().find(x=>x.code===item.code);
+  const usedByOthers=saleCart.filter((x,idx)=>idx!==i && x.code===item.code).reduce((s,x)=>s+x.qty,0);
+  if(p && q+usedByOthers>p.stock) return toast('Stock insuficiente para esa cantidad.');
+  item.qty=q; item.price=price; item.total=q*price;
+  saleCartEditIdx=null;
+  drawSaleCart();
+  toast('Producto actualizado en la venta');
+}
+function saveSale(){
+  if(!saleCart.length)return toast('Agregue productos');
+  let cond=num(scond.value),d=new Date(sdate.value+'T12:00:00'),client=sclient.value||'',invoice=num(document.getElementById('sinv').value);
+  if(!Number.isInteger(invoice)||invoice<1)return toast('Ingresa un N° de factura válido.');
+  const isEdit=editingSaleInvoice===invoice;
+  if(!isEdit && rows('FACTURAS & ABONOS VENTAS').slice(1).some(r=>num(r[2])===invoice))return toast('Ese N° de factura ya existe en ventas. Usa otro número.');
+  if(isEdit) removeSaleRecords(invoice);
+  normalizeInventory();
+  for(const x of saleCart){
+    const inv=productList().find(p=>p.code===x.code);
+    if(!inv || num(x.qty)>num(inv.stock)) return toast(`Stock insuficiente para ${x.name}. Disponible: ${inv?inv.stock:0} unidades.`);
+    const lotes=(DB['LOTES']||[]).slice(1).filter(r=>String(r[1]??'')===String(x.code) && num(r[9])>0);
+    const lotStock=lotes.reduce((a,r)=>a+num(r[9]),0);
+    if(lotStock<num(x.qty)) return toast(`No hay suficientes unidades en lotes para ${x.name}. Disponibles en lotes: ${lotStock}.`);
+  }
+  let total=saleCart.reduce((s,x)=>s+x.total,0)-num(sdisc.value);if(total<0)total=0;
+  let ws=DB['VENTAS'];
+  saleCart.forEach(x=>{let prod=productList().find(p=>p.code===x.code);let costo=prod?num(prod.cost):0;ws.push([x.code,iso(d),d.toLocaleString('es-CO',{month:'long'}),d.getFullYear(),x.name,x.price,costo,x.qty,x.total,x.qty*(x.price-costo),invoice]);});
+  let cv=DB['FACTURAS & ABONOS VENTAS'];let id=rows('CLIENTES').find(r=>r[1]===client)?.[0]||'';let venc=new Date(d);venc.setDate(venc.getDate()+cond);let pago=cond===0?total:0;
+  cv.push([id,client,invoice,cond===0?'CONTADO':`${cond} DIAS`,iso(d),total,iso(venc),pago,total-pago,total-pago===0?'CANCELADO':(new Date()>venc?'VENCIDA':'PENDIENTE'),cond===0?'-':cond,'']);
+  updateInvoiceSheet('venta',invoice,d,venc,client,total,cond,saleCart);
+  const result=updateInventoryAfterSale(saleCart);
+  if(!result.ok){
+    ws.splice(ws.length-saleCart.length,saleCart.length);
+    cv.pop();
+    return toast(`No se pudo descontar el lote de ${result.code}.`);
+  }
+  editingSaleInvoice=null;
+  rebuildCashFlow(); save();saleCart=[];saleCartEditIdx=null;closeModal();toast(isEdit?`Venta N° ${invoice} actualizada`:`Venta registrada — Factura N° ${invoice}`);show('ventas')
+}
+function restoreLotsForSale(items){
+  const lotes=DB['LOTES']||[];
+  for(const item of items){
+    let restante=num(item.qty);
+    const candidatos=lotes.slice(1).filter(r=>String(r[1]??'')===String(item.code))
+      .sort((a,b)=>new Date(b[4])-new Date(a[4]));
+    for(const r of candidatos){
+      if(restante<=0) break;
+      const cap=num(r[5])-num(r[9]);
+      const add=Math.min(restante,cap);
+      if(add>0){ r[9]=num(r[9])+add; restante-=add; }
+    }
+  }
+  for(let i=1;i<lotes.length;i++){
+    const r=lotes[i]; if(!r) continue;
+    const saldo=num(r[9]); const venc=new Date(r[6]);
+    r[8]=saldo<=0?'AGOTADO':(venc<new Date()?'VENCIDO':(Math.ceil((venc-new Date())/86400000)<=7?'POR VENCER':'VIGENTE'));
+  }
+}
+function removeSaleRecords(invoice){
+  const ws=DB['VENTAS']||[];
+  const items=ws.filter(r=>Array.isArray(r)&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO'&&num(r[10])===num(invoice)).map(r=>({code:r[0],qty:num(r[7])}));
+  DB['VENTAS']=ws.filter(r=>!(Array.isArray(r)&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO'&&num(r[10])===num(invoice)));
+  restoreLotsForSale(items);
+  const cv=DB['FACTURAS & ABONOS VENTAS']||[];
+  const idx=cv.findIndex(r=>Array.isArray(r)&&num(r[2])===num(invoice));
+  if(idx>=0) cv.splice(idx,1);
+}
+function editSale(invoice){
+  const items=(DB['VENTAS']||[]).filter(r=>Array.isArray(r)&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO'&&num(r[10])===num(invoice));
+  if(!items.length) return toast('No se encontraron líneas para esa factura');
+  saleCart=items.map(r=>({code:r[0],name:r[4],qty:num(r[7]),price:num(r[5]),total:num(r[8])}));
+  editingSaleInvoice=num(invoice);
+  openSaleForm();
+  toast('Editando venta — ajusta y presiona Guardar cambios');
+}
+function deleteSale(invoice){
+  if(!confirm(`¿Eliminar la venta N° ${invoice}? Esto restaurará el stock y no se puede deshacer.`)) return;
+  removeSaleRecords(invoice);
+  normalizeInventory();
+  rebuildCashFlow();
+  save();
+  toast(`Venta N° ${invoice} eliminada`);
+  show('ventas');
+}
+function consumeLotsForSale(items){
+  const lotes=DB['LOTES']||[];
+  for(const item of items){
+    let restante=num(item.qty);
+    const candidatos=lotes.slice(1).filter(r=>String(r[1]??'')===String(item.code) && num(r[9])>0)
+      .sort((a,b)=>new Date(a[4])-new Date(b[4]));
+    for(const r of candidatos){
+      if(restante<=0) break;
+      const saldo=num(r[9]);
+      const usar=Math.min(restante,saldo);
+      r[9]=saldo-usar;
+      restante-=usar;
+    }
+    if(restante>0) return {ok:false,code:item.code,missing:restante};
+  }
+  for(let i=1;i<lotes.length;i++){
+    const r=lotes[i];
+    if(!r) continue;
+    const saldo=num(r[9]);
+    const venc=new Date(r[6]);
+    r[8]=saldo<=0?'AGOTADO':(venc<new Date()?'VENCIDO':(Math.ceil((venc-new Date())/86400000)<=7?'POR VENCER':'VIGENTE'));
+    r[7]=isNaN(venc)?r[7]:Math.ceil((venc-new Date())/86400000);
+  }
+  return {ok:true};
+}
+function updateInventoryAfterSale(items){
+  normalizeInventory();
+  const result=consumeLotsForSale(items);
+  if(!result.ok) return result;
+  normalizeInventory();
+  save();
+  return result;
+}
+function nextInvoice(t){let arr=rows(t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA').slice(1);return arr.reduce((m,r)=>Math.max(m,num(r[2])),0)+1}
+function renderPurchase(c){
+  c.innerHTML=`<div class="title">COMPRAS / FACTURA DE COMPRA</div><div class="sub">Compra de productos, proveedor, lote y vencimiento de un mes. Condiciones: contado, 8 o 15 días.</div><div class="actions" style="margin-bottom:12px"><button class="btn" onclick="openPurchaseForm()">+ Registrar compra</button></div><div class="card"><h3>Últimas compras</h3>${purchaseHistoryTable()}</div>`;
+}
+function openPurchaseForm(){
+  let inv=editingPurchaseInvoice||nextInvoice('compra');let editing=!!editingPurchaseInvoice;
+  openModal(`<h3>${editing?'Editar compra N° '+inv:'Registrar compra'}</h3><div class="form"><div class="field"><label>N° factura</label><input id="pinv" type="number" min="1" step="1" value="${inv}"></div><div class="field"><label>Proveedor</label><select id="pven">${providerOpts()}</select></div><div class="field"><label>Condición</label>${creditSelect('pcond2')}</div><div class="field"><label>Fecha factura</label><input id="pdate" type="date" value="${iso(new Date())}"></div><div class="field"><label>Vencimiento crédito</label><input id="pcreditvenc" type="text" readonly></div><div class="field"><label>Producto</label><select id="pprod">${productOpts()}</select></div><div class="field"><label>Cantidad</label><input id="pqty" type="number" min="1" value="1"></div><div class="field"><label>Costo unitario</label><input id="pcost" type="number" min="0"></div><div class="field"><label>Vencimiento del lote</label><input id="plotvenc" type="text" readonly></div><div class="field actions" style="align-items:end"><button class="btn" onclick="addPurchaseItem()" type="button">+ Agregar producto</button></div></div><div id="purchasecart"></div><div class="actions"><button class="btn" id="purchaseSaveBtn" onclick="savePurchase()">${editing?'Guardar cambios de la compra N° '+inv:'Registrar compra N° '+inv}</button><button class="btn alt" onclick="purchaseCart=[];editingPurchaseInvoice=null;purchaseCartEditIdx=null;closeModal();show('compras')">${editing?'Cancelar edición':'Cancelar'}</button></div>`);
+  const refreshPurchaseDates=()=>{let d=new Date(document.getElementById('pdate').value+'T12:00:00');let cond=num(document.getElementById('pcond2').value);let cv=new Date(d);cv.setDate(cv.getDate()+cond);document.getElementById('pcreditvenc').value=date(cv);let lv=new Date(d);lv.setMonth(lv.getMonth()+1);document.getElementById('plotvenc').value=date(lv);drawPurchaseCart()};
+  document.getElementById('pinv').oninput=()=>{let n=num(document.getElementById('pinv').value);document.getElementById('purchaseSaveBtn').textContent=(editingPurchaseInvoice?'Guardar cambios de la compra N° ':'Registrar compra N° ')+(n||'')};
+  document.getElementById('pdate').onchange=refreshPurchaseDates;
+  document.getElementById('pcond2').onchange=refreshPurchaseDates;
+  document.getElementById('pprod').onchange=()=>{let p=productList().find(x=>x.code===pprod.value);pcost.value=p?p.cost:0;refreshPurchaseDates()};
+  document.getElementById('pprod').dispatchEvent(new Event('change'));
+  refreshPurchaseDates();
+  if(editing){
+    const cv=(DB['FACTURAS & ABONOS COMPRA']||[]).find(r=>Array.isArray(r)&&num(r[2])===num(editingPurchaseInvoice));
+    if(cv){document.getElementById('pven').value=cv[1]||'';document.getElementById('pdate').value=iso(cv[4]);document.getElementById('pcond2').value=cv[3]==='CONTADO'?0:num(cv[10]);refreshPurchaseDates();}
+  }
+  drawPurchaseCart();
+}
+function purchaseHistoryTable(){
+  const rs=portfolioDataRows('FACTURAS & ABONOS COMPRA').filter(r=>r[2]!=null&&r[2]!=='' && r[1]);
+  const h=['N° FACTURA','PROVEEDOR','CONDICION','FECHA','IMPORTE','PAGO','SALDO','ESTADO'];
+  return `<div class="tablewrap"><table class="tbl"><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}<th></th></tr></thead><tbody>${rs.length?rs.slice(-10).reverse().map(r=>`<tr><td>${esc(r[2])}</td><td>${esc(r[1])}</td><td>${esc(r[3])}</td><td>${date(r[4])}</td><td>${money(r[5])}</td><td>${money(r[7])}</td><td>${money(r[8])}</td><td>${esc(r[9])}</td><td class="actions"><button class="btn alt" onclick="editPurchase(${num(r[2])})">Editar</button><button class="btn danger" onclick="deletePurchase(${num(r[2])})">Eliminar</button></td></tr>`).join(''):`<tr><td colspan="9" class="empty">Sin compras registradas.</td></tr>`}</tbody></table></div>`;
+}
+function addPurchaseItem(){let p=productList().find(x=>x.code===pprod.value),q=num(pqty.value),cost=num(pcost.value);if(!p||q<1)return toast('Seleccione producto y cantidad');purchaseCart.push({code:p.code,name:p.name,qty:q,cost,total:q*cost});drawPurchaseCart()}
+function drawPurchaseCart(){let el=document.getElementById('purchasecart');if(!el)return;let total=purchaseCart.reduce((s,x)=>s+x.total,0);let lv=new Date(document.getElementById('pdate').value+'T12:00:00');lv.setMonth(lv.getMonth()+1);let loteVenc=date(lv);el.innerHTML=`<h3>Detalle de compra</h3>${purchaseCart.length?`<div class="tablewrap"><table class="tbl"><tr><th>Código</th><th>Producto</th><th>Cantidad</th><th>Costo</th><th>Vencimiento lote</th><th>Total</th><th></th></tr>${purchaseCart.map((x,i)=>purchaseCartEditIdx===i?`<tr><td>${esc(x.code)}</td><td>${esc(x.name)}</td><td><input id="epcqty" type="number" min="1" value="${x.qty}" style="width:70px"></td><td><input id="epccost" type="number" min="0" value="${x.cost}" style="width:90px"></td><td><b>${loteVenc}</b></td><td>-</td><td class="actions"><button class="btn alt" onclick="savePurchaseCartItem(${i})">Guardar</button><button class="btn" onclick="purchaseCartEditIdx=null;drawPurchaseCart()">Cancelar</button></td></tr>`:`<tr><td>${esc(x.code)}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${money(x.cost)}</td><td><b>${loteVenc}</b></td><td>${money(x.total)}</td><td class="actions"><button class="btn alt" onclick="purchaseCartEditIdx=${i};drawPurchaseCart()">Editar</button><button class="btn danger" onclick="purchaseCart.splice(${i},1);drawPurchaseCart()">Eliminar</button></td></tr>`).join('')}</table></div>`:'<div class="empty">No hay productos agregados.</div>'}<div class="card" style="margin-top:10px"><b>Total compra: ${money(total)}</b><br><span>Vencimiento del lote: <b>${loteVenc}</b></span></div>`}
+function savePurchaseCartItem(i){
+  const item=purchaseCart[i];
+  if(!item) return;
+  const q=num(document.getElementById('epcqty').value);
+  const cost=num(document.getElementById('epccost').value);
+  if(q<1) return toast('La cantidad debe ser mayor a 0.');
+  item.qty=q; item.cost=cost; item.total=q*cost;
+  purchaseCartEditIdx=null;
+  drawPurchaseCart();
+  toast('Producto actualizado en la compra');
+}
+function purchasePortfolioHeaderIndex(){
+  const rs=DB['FACTURAS & ABONOS COMPRA']||[];
+  return rs.findIndex(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim().toUpperCase()==='N_FACTURA'));
+}
+function purchasePortfolioFind(invoice){
+  const rs=DB['FACTURAS & ABONOS COMPRA']||[];
+  return rs.findIndex((r,i)=>i>purchasePortfolioHeaderIndex() && num(r?.[2])===num(invoice));
+}
+function upsertPurchasePortfolio({id,prov,invoice,cond,d,total,venc}){
+  const name='FACTURAS & ABONOS COMPRA';
+  if(!DB[name]) DB[name]=[];
+  const rs=DB[name];
+  const header=purchasePortfolioHeaderIndex();
+  const row=[id,prov,invoice,cond===0?'CONTADO':`${cond} DIAS`,iso(d),total,iso(venc),cond===0?total:0,cond===0?0:total,cond===0?'CANCELADO':(new Date()>venc?'VENCIDA':'PENDIENTE'),cond===0?'-':cond,''];
+  const existing=purchasePortfolioFind(invoice);
+  if(existing>=0) rs[existing]=row;
+  else rs.splice(header>=0?header+1:rs.length,0,row);
+}
+function savePurchase(){
+  if(!purchaseCart.length)return toast('Agregue productos');
+  const cond=num(pcond2.value),d=new Date(pdate.value+'T12:00:00'),prov=pven.value;
+  const total=purchaseCart.reduce((s,x)=>s+x.total,0);
+  const venc=new Date(d);venc.setDate(venc.getDate()+cond);
+  const invoice=num(document.getElementById('pinv').value);
+  if(!Number.isInteger(invoice)||invoice<1)return toast('Ingresa un N° de factura válido.');
+  const isEdit=editingPurchaseInvoice===invoice;
+  if(!isEdit && purchasePortfolioFind(invoice)>=0)return toast('Ese N° de factura ya existe en compras. Usa otro número.');
+  if(isEdit) removePurchaseRecords(invoice);
+
+  // 1. Guardar cada línea en COMPRAS.
+  const ws=DB['COMPRAS'];
+  purchaseCart.forEach(x=>ws.push([x.code,iso(d),d.toLocaleString('es-CO',{month:'long'}),d.getFullYear(),x.name,x.cost,x.qty,x.total,invoice]));
+
+  // 2. Crear UNA factura en FACTURAS & ABONOS COMPRA.
+  const id=rows('PROVEEDORES').find(r=>String(r[1]??'').trim().toUpperCase()===String(prov??'').trim().toUpperCase())?.[0]||'';
+  upsertPurchasePortfolio({id,prov,invoice,cond,d,total,venc});
+
+  // 3. Actualizar FACTURA COMPRA con el mismo N° y todos sus productos.
+  updateInvoiceSheet('compra',invoice,d,venc,prov,total,cond,purchaseCart);
+
+  // 4. Crear los lotes vinculados a la factura.
+  const lot=DB['LOTES'];
+  purchaseCart.forEach(x=>{
+    let v=new Date(d); v.setMonth(v.getMonth()+1);
+    let n=lot.slice(1).reduce((m,r)=>Math.max(m,num(r[0])),0)+1;
+    lot.push([n,x.code,x.name,invoice,iso(d),x.qty,iso(v),Math.ceil((v-d)/86400000),'VIGENTE',x.qty]);
+  });
+
+  // 5. RECONSTRUIR INVENTARIO desde COMPRAS y VENTAS.
+  normalizeInventory();
+  rebuildCashFlow();
+  save();
+  editingPurchaseInvoice=null;
+  purchaseCart=[];
+  purchaseCartEditIdx=null;
+  closeModal();
+  toast(isEdit?`Compra N° ${invoice} actualizada`:'Compra registrada en COMPRAS + INVENTARIO + LOTES + FACTURA COMPRA + CARTERA');
+  show('compras');
+}
+function removePurchaseRecords(invoice){
+  const ws=DB['COMPRAS']||[];
+  DB['COMPRAS']=ws.filter(r=>!(Array.isArray(r)&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO'&&num(r[8])===num(invoice)));
+  const lot=DB['LOTES']||[];
+  DB['LOTES']=lot.filter(r=>!(Array.isArray(r)&&num(r[3])===num(invoice)));
+  const cv=DB['FACTURAS & ABONOS COMPRA']||[];
+  const idx=purchasePortfolioFind(invoice);
+  if(idx>=0) cv.splice(idx,1);
+}
+function editPurchase(invoice){
+  const items=(DB['COMPRAS']||[]).filter(r=>Array.isArray(r)&&r[0]&&String(r[0]).toUpperCase()!=='CODIGO'&&num(r[8])===num(invoice));
+  if(!items.length) return toast('No se encontraron líneas para esa factura');
+  purchaseCart=items.map(r=>({code:r[0],name:r[4],qty:num(r[6]),cost:num(r[5]),total:num(r[7])}));
+  editingPurchaseInvoice=num(invoice);
+  openPurchaseForm();
+  toast('Editando compra — ajusta y presiona Guardar cambios');
+}
+function deletePurchase(invoice){
+  const lot=(DB['LOTES']||[]).filter(r=>Array.isArray(r)&&num(r[3])===num(invoice));
+  const consumed=lot.some(r=>num(r[9])<num(r[5]));
+  const msg=consumed
+    ?'Ya se vendieron unidades de esta compra. Si la eliminas, el inventario puede quedar negativo o inconsistente. ¿Eliminar de todas formas?'
+    :`¿Eliminar la compra N° ${invoice}?`;
+  if(!confirm(msg)) return;
+  removePurchaseRecords(invoice);
+  normalizeInventory();
+  rebuildCashFlow();
+  save();
+  toast(`Compra N° ${invoice} eliminada`);
+  show('compras');
+}
+function expenseRows(){
+  const rs=rows('GASTOS')||[];
+  // Formato actual: [CONCEPTO, FECHA, VALOR]
+  if(rs.length && String(rs[0]?.[0]??'').toUpperCase()==='CONCEPTO'){
+    return rs.slice(1).filter(r=>r&&String(r[0]??'').trim());
+  }
+  // Compatibilidad con la estructura antigua del Excel:
+  // fila 3 contiene CONCEPTO/FECHA/VALOR y los conceptos de catálogo vienen después.
+  return rs.slice(3).filter(r=>r&&String(r[2]??'').trim()).map(r=>[r[2],r[3],r[4]]);
+}
+function renderExpense(c){
+  const data=expenseRows();
+  const expenseTable=`<div class="tablewrap"><table class="tbl"><thead><tr><th>CONCEPTO</th><th>FECHA</th><th>VALOR</th></tr></thead><tbody>${
+    data.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${money(num(r[2]))}</td></tr>`).join('')
+  }</tbody></table></div>`;
+  c.innerHTML=`<div class="title">GASTOS</div><div class="sub">Tabla de gastos del Excel.</div><div class="actions" style="margin-bottom:12px"><button class="btn" onclick="newExpense()">+ Registrar gasto</button></div>${expenseTable}`;
+}
+function newExpense(){
+  const base=rows('GASTOS').slice(3).map(r=>String(r?.[0]??'').trim()).filter(Boolean);
+  const opts=[...new Set(base)].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  openModal(`<h3>Registrar gasto</h3><form class="form" onsubmit="addExpense(event)"><div class="field"><label>Concepto</label><select id="gcon" required><option value="">Selecciona un gasto</option>${opts}<option value="__OTRO__">OTRO</option></select></div><div class="field hide" id="gconOtherWrap"><label>Otro concepto</label><input id="gconOther" placeholder="Escribe el concepto"></div><div class="field"><label>Fecha</label><input id="gdate" type="date" value="${iso(new Date())}" required></div><div class="field"><label>Valor del gasto</label><input id="gval" type="number" min="0.01" step="0.01" required inputmode="decimal" placeholder="0"></div><div class="full actions"><button class="btn">Guardar gasto</button><button class="btn alt" type="button" onclick="closeModal()">Cancelar</button></div></form>`);
+  const sel=document.getElementById('gcon'),wrap=document.getElementById('gconOtherWrap');
+  sel.onchange=()=>{wrap.classList.toggle('hide',sel.value!=='__OTRO__');if(sel.value!=='__OTRO__')document.getElementById('gconOther').value='';};
+}
+function addExpense(e){
+  e.preventDefault();
+  const sel=document.getElementById('gcon');
+  const concept=sel.value==='__OTRO__'?String(document.getElementById('gconOther').value||'').trim():String(sel.value||'').trim();
+  const fecha=document.getElementById('gdate').value;
+  const valor=num(document.getElementById('gval').value);
+  if(!concept)return alert('Selecciona el concepto del gasto.');
+  if(!fecha)return alert('Selecciona la fecha del gasto.');
+  if(valor<=0)return alert('Ingresa un valor de gasto mayor que 0.');
+
+  // Normalizamos GASTOS a una tabla real: CONCEPTO | FECHA | VALOR.
+  const existing=expenseRows();
+  DB['GASTOS']=[['CONCEPTO','FECHA','VALOR'],...existing,[concept,fecha,valor]];
+
+  rebuildCashFlow();
+  save();
+  closeModal();
+  toast(`Gasto registrado: ${money(valor)}`);
+  show('gastos');
+}
+function rebuildCashFlow(){
+  const months=new Map();
+
+  function ensureMonth(value){
+    if(!value)return null;
+    const raw=String(value).slice(0,10);
+    const dt=new Date(raw+'T00:00:00');
+    if(isNaN(dt))return null;
+    const y=dt.getFullYear(),m=dt.getMonth()+1,key=`${y}-${String(m).padStart(2,'0')}`;
+    if(!months.has(key))months.set(key,{y,m,text:dt.toLocaleString('es-CO',{month:'long'}),in:0,pc:0,g:0});
+    return months.get(key);
+  }
+
+  // GASTOS
+  expenseRows().forEach(r=>{
+    const x=ensureMonth(r[1]),v=num(r[2]);
+    if(x&&v>0)x.g+=v;
+  });
+
+  // FACTURAS DE VENTA: solo CONTADO entra inmediatamente a caja.
+  // Las ventas a crédito entran a caja únicamente mediante ABONOS.
+  const fv=DB['FACTURAS & ABONOS VENTAS']||[];
+  const hv=portfolioHeaderRow('FACTURAS & ABONOS VENTAS');
+  fv.slice(hv+1).forEach(r=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='')return;
+    const cond=String(r[3]??'').trim().toUpperCase();
+    if(cond==='CONTADO'){
+      const x=ensureMonth(r[4]),v=num(r[5]);
+      if(x&&v>0)x.in+=v;
+    }
+  });
+
+  // FACTURAS DE COMPRA: solo CONTADO sale inmediatamente de caja.
+  // Las compras a crédito salen mediante ABONOS A PROVEEDOR.
+  const fc=DB['FACTURAS & ABONOS COMPRA']||[];
+  const hc=portfolioHeaderRow('FACTURAS & ABONOS COMPRA');
+  fc.slice(hc+1).forEach(r=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='')return;
+    const cond=String(r[3]??'').trim().toUpperCase();
+    if(cond==='CONTADO'){
+      const x=ensureMonth(r[4]),v=num(r[5]);
+      if(x&&v>0)x.pc+=v;
+    }
+  });
+
+  // ABONOS: en estas hojas se guardan en columnas 13=FECHA, 14=FACTURA, 15=MONTO.
+  // Se usan solo las filas que tengan una fecha de abono y un monto positivo.
+  function addAbonos(name,entrada){
+    const rs=DB[name]||[];
+    const h=portfolioHeaderRow(name);
+    rs.slice(h+1).forEach(r=>{
+      if(!Array.isArray(r))return;
+      const fecha=r[13],monto=num(r[15]);
+      if(!fecha||monto<=0)return;
+      const x=ensureMonth(fecha);
+      if(x){
+        if(entrada)x.in+=monto;
+        else x.pc+=monto;
+      }
+    });
+  }
+  addAbonos('FACTURAS & ABONOS VENTAS',true);
+  addAbonos('FACTURAS & ABONOS COMPRA',false);
+
+  const data=[['AÑO','MES','MES_TEXTO','ENTRADAS','SALIDAS COMPRAS','SALIDAS GASTOS','FLUJO NETO','SALDO ACUMULADO']];
+  let saldo=0;
+  [...months.values()].sort((a,b)=>a.y-b.y||a.m-b.m).forEach(x=>{
+    const net=x.in-x.pc-x.g;
+    saldo+=net;
+    data.push([x.y,x.m,x.text,x.in,x.pc,x.g,net,saldo]);
+  });
+  DB['FLUJO DE CAJA']=data;
+}
+
+
+
+function businessResultSummary(){
+  // VENTAS: total facturado desde FACTURAS & ABONOS VENTAS.
+  // COSTO DE LO VENDIDO: costo unitario real de cada línea vendida x cantidad.
+  const fv=DB['FACTURAS & ABONOS VENTAS']||[];
+  const hf=portfolioHeaderRow('FACTURAS & ABONOS VENTAS');
+  const ventas=fv.slice(hf+1).reduce((a,r)=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='') return a;
+    return a+num(r[5]);
+  },0);
+
+  const vr=DB['VENTAS']||[];
+  const hv=vr.findIndex(r=>Array.isArray(r)&&String(r[0]??'').toUpperCase()==='CODIGO');
+  const costo=vr.slice(hv>=0?hv+1:1).reduce((a,r)=>{
+    if(!Array.isArray(r)||!r[0]) return a;
+    return a+(num(r[6])*num(r[7]));
+  },0);
+
+  const gastos=expenseRows().reduce((a,r)=>a+num(r[2]),0);
+  return {ventas,costo,utilidad:ventas-costo,gastos,operativa:ventas-costo-gastos};
+}
+
+function portfolioSummary(sheet){
+  const rs=DB[sheet]||[];
+  const h=portfolioHeaderRow(sheet);
+  const rowsData=rs.slice(h+1);
+  let total=0, saldo=0, pendientes=0, vencidas=0;
+  const today=new Date(); today.setHours(0,0,0,0);
+  rowsData.forEach(r=>{
+    if(!Array.isArray(r)||r[2]==null||r[2]==='') return;
+    const importe=num(r[5]), pago=num(r[7]), sal=num(r[8]);
+    total+=importe; saldo+=sal;
+    if(sal>0){
+      pendientes++;
+      const venc=r[6];
+      if(venc){
+        const d=new Date(String(venc).slice(0,10)+'T00:00:00');
+        if(!isNaN(d)&&d<today) vencidas++;
+      }
+    }
+  });
+  return {total,saldo,pendientes,vencidas};
+}
+
+function renderFlow(c){
+  rebuildCashFlow();
+  save();
+
+  const rs=rows('FLUJO DE CAJA');
+  const data=rs.slice(1);
+  const last=data[data.length-1]||[];
+  const entradas=data.reduce((a,r)=>a+num(r[3]),0);
+  const compras=data.reduce((a,r)=>a+num(r[4]),0);
+  const gastos=data.reduce((a,r)=>a+num(r[5]),0);
+  const neto=entradas-compras-gastos;
+  const saldo=last[7]!=null?num(last[7]):neto;
+
+  const result=businessResultSummary();
+  const clientes=portfolioSummary('FACTURAS & ABONOS VENTAS');
+  const proveedores=portfolioSummary('FACTURAS & ABONOS COMPRA');
+  const posicion=saldo+clientes.saldo-proveedores.saldo;
+
+  const flowRows=data.map(r=>`
+    <div class="flow-row">
+      <div><b>${esc(r[2]??'')}</b><small>${esc(r[0]??'')} · ${esc(r[1]??'')}</small></div>
+      <div class="flow-values">
+        <span>Entradas<br><b>${money(r[3])}</b></span>
+        <span>Compras<br><b>${money(r[4])}</b></span>
+        <span>Gastos<br><b>${money(r[5])}</b></span>
+        <span>Flujo<br><b>${money(r[6])}</b></span>
+      </div>
+    </div>`).join('');
+
+  c.innerHTML=`
+    <div class="title">RESULTADO Y FLUJO DE CAJA</div>
+    <div class="sub">Resultado de las ventas, costo de lo vendido, caja y cartera.</div>
+
+    <div class="card">
+      <h3>📊 RESULTADO DEL NEGOCIO</h3>
+      <div class="summary-list">
+        <div><span>VENTAS</span><b>${money(result.ventas)}</b></div>
+        <div><span>(−) COSTO DE LO VENDIDO</span><b>${money(result.costo)}</b></div>
+        <div><span><b>UTILIDAD BRUTA</b></span><b>${money(result.utilidad)}</b></div>
+        <div><span>(−) GASTOS</span><b>${money(result.gastos)}</b></div>
+        <div><span><b>UTILIDAD OPERACIONAL</b></span><b>${money(result.operativa)}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💵 FLUJO DE CAJA</h3>
+      <div class="summary-list">
+        <div><span>Entradas de efectivo</span><b>${money(entradas)}</b></div>
+        <div><span>Salidas por compras</span><b>${money(compras)}</b></div>
+        <div><span>Salidas por gastos</span><b>${money(gastos)}</b></div>
+        <div><span><b>FLUJO NETO</b></span><b>${money(neto)}</b></div>
+        <div><span>Saldo acumulado</span><b>${money(saldo)}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👥 CARTERA DE CLIENTES</h3>
+      <div class="summary-list">
+        <div><span>Total facturado</span><b>${money(clientes.total)}</b></div>
+        <div><span>Saldo por cobrar</span><b>${money(clientes.saldo)}</b></div>
+        <div><span>Facturas pendientes</span><b>${clientes.pendientes}</b></div>
+        <div><span>Facturas vencidas</span><b>${clientes.vencidas}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🚚 CARTERA DE PROVEEDORES</h3>
+      <div class="summary-list">
+        <div><span>Total comprado</span><b>${money(proveedores.total)}</b></div>
+        <div><span>Saldo por pagar</span><b>${money(proveedores.saldo)}</b></div>
+        <div><span>Facturas pendientes</span><b>${proveedores.pendientes}</b></div>
+        <div><span>Facturas vencidas</span><b>${proveedores.vencidas}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📌 POSICIÓN DEL NEGOCIO</h3>
+      <div class="summary-list">
+        <div><span>Dinero en caja</span><b>${money(saldo)}</b></div>
+        <div><span>Por cobrar</span><b>${money(clientes.saldo)}</b></div>
+        <div><span>Por pagar</span><b>${money(proveedores.saldo)}</b></div>
+        <div><span><b>POSICIÓN NETA</b></span><b>${money(posicion)}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📅 MOVIMIENTO MENSUAL DE CAJA</h3>
+      ${flowRows || '<div class="empty">Aún no hay movimientos de caja registrados.</div>'}
+    </div>
+  `;
+}
+
+function renderLots(c){let rs=rows('LOTES').slice(1);let today=new Date();c.innerHTML=`<div class="title">LOTES DE INVENTARIO</div><div class="sub">Vencimiento de los lotes: un mes después de la compra.</div><div class="tablewrap"><table class="tbl"><tr>${headers(rows('LOTES')).map(h=>`<th>${esc(h)}</th>`).join('')}</tr>${rs.map(r=>{let d=new Date(r[6]),days=Math.ceil((d-today)/86400000);let st=days<0?'VENCIDO':days<=7?'POR VENCER':'VIGENTE';return `<tr>${r.map((v,j)=>`<td>${j===6?date(v):j===7?days:j===8?st:esc(v??'')}</td>`).join('')}</tr>`}).join('')}</table></div>`}
+function portfolioHeaderRow(name){const rs=rows(name);const i=rs.findIndex(r=>Array.isArray(r)&&r.some(v=>String(v??'').trim().toUpperCase()==='N_FACTURA'));return i>=0?i:0}
+function portfolioDataRows(name){const rs=rows(name);const h=portfolioHeaderRow(name);return rs.slice(h+1).filter(r=>Array.isArray(r)&&r.some(v=>v!==null&&v!==''));}
+function portfolioDataRowsIndexed(name){const rs=rows(name);const h=portfolioHeaderRow(name);const out=[];for(let i=h+1;i<rs.length;i++){const r=rs[i];if(Array.isArray(r)&&r.some(v=>v!==null&&v!=='')) out.push({idx:i,row:r});}return out;}
+function applyAbonoDelta(name,factura,delta){
+  const rs=DB[name]||[];
+  const h=portfolioHeaderRow(name);
+  const r=rs.find((row,i)=>i>h && num(row?.[2])===factura);
+  if(!r) return null;
+  r[7]=Math.max(0,num(r[7])+delta);
+  r[8]=Math.max(0,num(r[5])-r[7]);
+  const venc=new Date(r[6]);
+  r[9]=r[8]===0?'CANCELADO':(venc<new Date()?'VENCIDA':'PENDIENTE');
+  r[10]=r[8]===0?'-':(r[10]==='-'?Math.max(0,Math.ceil((venc-new Date())/86400000)):r[10]);
+  return r;
+}
+function calcPortfolio(t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';let rs=portfolioDataRows(name).filter(r=>r[2]!=null&&r[2]!=='');return {balance:rs.reduce((s,r)=>s+num(r[8]),0),rows:rs}}
+function compactPortfolioTable(t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';let h=rows(name)[portfolioHeaderRow(name)]||[];let rs=portfolioDataRows(name).filter(r=>r[2]!=null&&r[2]!=='');let cols=t==='venta'?['ID_CLIENTE','CLIENTE','N_FACTURA','CONDICION','FECHA _FACTURA','IMPORTE','FECHA_VENCIMIENTO','PAGO','SALDO','ESTADO','DIAS','RANGO']:['ID_PROVEEDOR','PROVEEDOR','N_FACTURA','CONDICION','FECHA _FACTURA','IMPORTE','FECHA_VENCIMIENTO','PAGO','SALDO','ESTADO','DIAS','RANGO'];let idx=cols.map(x=>h.findIndex(y=>String(y??'').trim().toUpperCase()===x));let facIdx=idx[cols.indexOf('N_FACTURA')];return `<div class="tablewrap cartera-table"><table class="tbl"><thead><tr>${cols.map(x=>`<th>${esc(x.replace('FECHA _FACTURA','FECHA FACTURA'))}</th>`).join('')}<th></th></tr></thead><tbody>${rs.map(r=>{const fac=num(r[facIdx]);return `<tr>${idx.map((j,k)=>{let v=j>=0?r[j]:'';if(cols[k].includes('FECHA'))v=date(v);if(cols[k]==='IMPORTE'||cols[k]==='PAGO'||cols[k]==='SALDO')v=money(v);return `<td>${esc(v??'')}</td>`}).join('')}<td class="actions">${t==='venta'?`<button class="btn alt" onclick="editSale(${fac})">Editar</button><button class="btn danger" onclick="deleteSale(${fac})">Eliminar</button>`:`<button class="btn alt" onclick="editPurchase(${fac})">Editar</button><button class="btn danger" onclick="deletePurchase(${fac})">Eliminar</button>`}</td></tr>`}).join('')||'<tr><td colspan="13" class="empty">No hay facturas registradas.</td></tr>'}</tbody></table></div>`}
+function abonosTable(t){
+  let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  let h=rows(name)[portfolioHeaderRow(name)]||[];
+  let f=h.findIndex(x=>String(x??'').trim().toUpperCase().startsWith('FACTURA'));
+  let dateI=h.findIndex(x=>String(x??'').trim().toUpperCase()==='FECHA');
+  let m=h.findIndex(x=>String(x??'').trim().toUpperCase()==='MONTO');
+  if(f<0||dateI<0||m<0)return '';
+  let rs=portfolioDataRowsIndexed(name).filter(x=>x.row[f]!=null&&x.row[m]!=null);
+  let data=rs.map(x=>`<tr><td>${date(x.row[dateI])}</td><td>${esc(x.row[f])}</td><td>${money(x.row[m])}</td><td class="actions"><button class="btn alt" onclick="editAbono('${name}',${x.idx})">Editar</button><button class="btn danger" onclick="deleteAbono('${name}',${x.idx})">Eliminar</button></td></tr>`).join('');
+  return `<h3 style="margin-top:18px">ABONOS REGISTRADOS</h3><div class="tablewrap"><table class="tbl"><thead><tr><th>FECHA</th><th>N° FACTURA</th><th>MONTO</th><th></th></tr></thead><tbody>${data||'<tr><td colspan="4" class="empty">No hay abonos registrados.</td></tr>'}</tbody></table></div>`;
+}
+function editAbono(name,idx){
+  const rs=DB[name]||[];
+  const r=rs[idx];
+  if(!r) return;
+  openModal(`<h3>Editar abono</h3><form class="form" onsubmit="saveAbonoEdit(event,'${name}',${idx})"><div class="field"><label>N° factura</label><input value="${esc(r[14])}" disabled></div><div class="field"><label>Fecha</label><input id="eabfecha" type="date" value="${iso(r[13])}" required></div><div class="field"><label>Valor abono</label><input id="eabval" type="number" min="0.01" step="0.01" value="${num(r[15])}" required></div><div class="full actions"><button class="btn">Guardar cambios</button><button class="btn alt" type="button" onclick="closeModal()">Cancelar</button></div></form>`);
+}
+function saveAbonoEdit(e,name,idx){
+  e.preventDefault();
+  const rs=DB[name]||[];
+  const r=rs[idx];
+  if(!r) return closeModal();
+  const factura=num(r[14]);
+  const oldMonto=num(r[15]);
+  const newFecha=document.getElementById('eabfecha').value;
+  const newMonto=num(document.getElementById('eabval').value);
+  if(!newFecha) return toast('Selecciona la fecha del abono.');
+  if(newMonto<=0) return toast('Ingresa un valor de abono mayor que 0.');
+  const inv=applyAbonoDelta(name,factura,-oldMonto);
+  if(!inv) return toast('Factura no encontrada');
+  const saldoDisponible=Math.max(0,num(inv[5])-num(inv[7]));
+  if(newMonto>saldoDisponible){
+    applyAbonoDelta(name,factura,oldMonto);
+    return toast(`El abono no puede superar el saldo pendiente de ${money(saldoDisponible)}.`);
+  }
+  applyAbonoDelta(name,factura,newMonto);
+  r[13]=newFecha;
+  r[15]=newMonto;
+  rebuildCashFlow();
+  save();
+  closeModal();
+  toast('Abono actualizado');
+  show(name==='FACTURAS & ABONOS VENTAS'?'carteraventa':'carteracompra');
+}
+function deleteAbono(name,idx){
+  const rs=DB[name]||[];
+  const r=rs[idx];
+  if(!r) return;
+  if(!confirm(`¿Eliminar el abono de ${money(num(r[15]))} de la factura N° ${r[14]}? Esto aumentará el saldo pendiente de la factura.`)) return;
+  const factura=num(r[14]);
+  const monto=num(r[15]);
+  applyAbonoDelta(name,factura,-monto);
+  rs.splice(idx,1);
+  rebuildCashFlow();
+  save();
+  toast('Abono eliminado');
+  show(name==='FACTURAS & ABONOS VENTAS'?'carteraventa':'carteracompra');
+}
+function renderPortfolio(c,t){let name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';let p=calcPortfolio(t);c.innerHTML=`<div class="title">${name}</div><div class="cards"><div class="card metric"><span>Total cartera</span><b>${money(p.balance)}</b></div><div class="card metric"><span>Facturas</span><b>${p.rows.length}</b></div></div><div class="actions" style="margin:12px 0"><button class="btn" onclick="newAbono('${t}')">+ Registrar abono</button></div><div class="card"><h3>Facturas</h3>${compactPortfolioTable(t)}${abonosTable(t)}</div>`}
+function newAbono(t){
+  openModal(`<h3>Registrar abono</h3><form class="form" onsubmit="addAbono(event,'${t}')"><div class="field"><label>N° factura</label><input id="abfact" type="number" min="1" required></div><div class="field"><label>Valor abono</label><input id="abval" type="number" min="0" required></div><div class="full actions"><button class="btn">Registrar abono</button><button class="btn alt" type="button" onclick="closeModal()">Cancelar</button></div></form>`);
+}
+function addAbono(e,t){
+  e.preventDefault();
+  const name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  const rs=DB[name]||[];
+  const invoice=num(document.getElementById('abfact').value);
+  const v=num(document.getElementById('abval').value);
+  if(!invoice||v<=0)return toast('Ingresa una factura y un valor de abono válido.');
+  const h=portfolioHeaderRow(name);
+  const r=rs.find((row,i)=>i>h && num(row?.[2])===invoice);
+  if(!r)return toast('Factura no encontrada');
+  const saldoActual=Math.max(0,num(r[5])-num(r[7]));
+  if(v>saldoActual)return toast(`El abono no puede superar el saldo pendiente de ${money(saldoActual)}.`);
+  r[7]=num(r[7])+v;
+  r[8]=Math.max(0,num(r[5])-r[7]);
+  const venc=new Date(r[6]);
+  r[9]=r[8]===0?'CANCELADO':(venc<new Date()?'VENCIDA':'PENDIENTE');
+  r[10]=r[8]===0?'-':(r[10]==='-'?Math.max(0,Math.ceil((venc-new Date())/86400000)):r[10]);
+  const fechaAbono=iso(new Date());
+  const abonoRow=[];
+  const width=Math.max(16, ...rs.map(x=>Array.isArray(x)?x.length:0));
+  for(let i=0;i<width;i++)abonoRow.push(null);
+  abonoRow[13]=fechaAbono;
+  abonoRow[14]=invoice;
+  abonoRow[15]=v;
+  rs.push(abonoRow);
+  DB[name]=rs;
+  rebuildCashFlow();
+  save();
+  closeModal();
+  toast(`Abono registrado el ${date(fechaAbono)}`);
+  show(t==='venta'?'carteraventa':'carteracompra');
+}
+function salesHistoryTable(){let rs=rows('FACTURAS & ABONOS VENTAS').slice(1).filter(r=>r[2]!=null&&r[2]!==''),h=['N° FACTURA','CLIENTE','CONDICION','FECHA','IMPORTE','PAGO','SALDO','ESTADO'];return `<div class="tablewrap"><table class="tbl"><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}<th></th></tr></thead><tbody>${rs.slice(-10).reverse().map(r=>`<tr><td>${esc(r[2])}</td><td>${esc(r[1]||'Venta directa')}</td><td>${esc(r[3])}</td><td>${date(r[4])}</td><td>${money(r[5])}</td><td>${money(r[7])}</td><td>${money(r[8])}</td><td>${esc(r[9])}</td><td class="actions"><button class="btn alt" onclick="editSale(${num(r[2])})">Editar</button><button class="btn danger" onclick="deleteSale(${num(r[2])})">Eliminar</button></td></tr>`).join('')}</tbody></table></div>`}
+function updateInvoiceSheet(t,invoice,d,venc,party,total,cond,items){
+  let name=t==='venta'?'FACTURA VENTA':'FACTURA COMPRA',r=DB[name]||[];
+  if(!r.length)return;
+  // Fecha de vencimiento de la cartera = vencimiento del crédito (0, 8 o 15 días).
+  // Para FACTURA COMPRA además mostramos, por cada producto, el vencimiento del LOTE (1 mes desde la compra).
+  for(let i=0;i<r.length;i++){
+    if(String(r[i][6]??'')==='Factura No.:')r[i][7]=invoice;
+    if(String(r[i][6]??'')==='Fecha:')r[i][7]=iso(d);
+    if(String(r[i][6]??'')==='Fecha de vencimiento:')r[i][7]=iso(venc);
+    if(String(r[i][6]??'')==='Pago Contado')r[i][8]=cond===0?total:0;
+    if(String(r[i][6]??'').trim()==='Pago Crédito')r[i][8]=cond>0?total:0;
+    if(String(r[i][6]??'').trim()==='Días Crédito')r[i][8]=cond;
+  }
+  let infoRow=r.findIndex(x=>String(x[0]??'').toUpperCase()===(t==='venta'?'CLIENTE':'PROVEEDOR'));
+  if(infoRow>=0)r[infoRow][1]=party;
+  let header=r.findIndex(x=>String(x[0]??'').toUpperCase()==='CÓDIGO'||String(x[0]??'').toUpperCase()==='CODIGO');
+  if(header>=0){
+    // Conservamos la sección INFORMACIÓN DE PAGO de la plantilla y reemplazamos solo las filas de productos.
+    let payStart=r.findIndex((row,idx)=>idx>header && (String(row[7]??'').trim()==='Total Factura'||String(row[7]??'').trim()==='INFORMACIÓN DE PAGO'));
+    let removeCount=payStart>=0?payStart-header-1:Math.max(0,r.length-(header+1));
+    if(removeCount>0)r.splice(header+1,removeCount);
+    let itemRows=items.map(x=>{
+      if(t==='compra'){
+        let loteVenc=new Date(d);
+        loteVenc.setMonth(loteVenc.getMonth()+1);
+        return [x.code,x.name,x.qty,x.cost,null,x.total,iso(loteVenc),null,null];
+      }
+      return [x.code,x.name,x.qty,x.price,null,x.total,null,null,null];
+    });
+    r.splice(header+1,0,...itemRows);
+  }
+  save();
+}
+function invoiceOptions(t,selected){
+  const name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  return rows(name).slice(1).filter(r=>r&&r[2]!=null&&r[2]!=='').sort((a,b)=>num(a[2])-num(b[2])).map(r=>`<option value="${esc(r[2])}" ${num(r[2])===num(selected)?'selected':''}>Factura N° ${esc(r[2])} — ${esc(r[1]||'')}</option>`).join('');
+}
+function renderLinkedInvoice(c,t,invoice){
+  const portName=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  const pr=rows(portName).slice(1).find(r=>num(r[2])===num(invoice));
+  if(!pr){c.innerHTML='<div class="empty">Factura no encontrada.</div>';return}
+  const sheet=t==='venta'?'VENTAS':'COMPRAS';
+  const all=rows(sheet); const hi=all.findIndex(r=>String(r?.[0]??'').toUpperCase()==='CODIGO');
+  const lines=all.slice(hi+1).filter(r=>r&&r[0]&&num(r[r.length-1])===num(invoice));
+  const dateFactura=date(pr[4]), venc=date(pr[6]), total=num(pr[5]), pago=num(pr[7]), saldo=num(pr[8]), cond=pr[3]||'CONTADO';
+  const party=pr[1]||'';
+  const headersLine=t==='venta'?['Código','Producto','Cantidad','Precio Unit.','Total']:['Código','Producto','Cantidad','Costo Unit.','Vencimiento lote','Total'];
+  const body=lines.map(r=>{
+    const lote=t==='compra'?(()=>{let d=new Date(r[1]);d.setMonth(d.getMonth()+1);return date(d)})():'';
+    return t==='venta'?`<tr><td>${esc(r[0])}</td><td>${esc(r[4])}</td><td>${num(r[7])}</td><td>${money(r[5])}</td><td>${money(r[8])}</td></tr>`:`<tr><td>${esc(r[0])}</td><td>${esc(r[4])}</td><td>${num(r[6])}</td><td>${money(r[5])}</td><td>${lote}</td><td>${money(r[7])}</td></tr>`;
+  }).join('');
+  c.innerHTML=`<div class="title">${t==='venta'?'FACTURA DE VENTA':'FACTURA DE COMPRA'}</div>
+  <div class="sub">Factura vinculada directamente con ${t==='venta'?'VENTAS':'COMPRAS'} y ${t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA'}.</div>
+  <div class="card"><div class="form"><div class="field"><label>Seleccionar factura</label><select onchange="showLinkedInvoice('${t}',this.value)">${invoiceOptions(t,invoice)}</select></div><div class="field"><label>N° factura</label><input value="${esc(invoice)}" readonly></div><div class="field"><label>${t==='venta'?'Cliente':'Proveedor'}</label><input value="${esc(party)}" readonly></div><div class="field"><label>Condición</label><input value="${esc(cond)}" readonly></div><div class="field"><label>Fecha</label><input value="${esc(dateFactura)}" readonly></div><div class="field"><label>Fecha de vencimiento crédito</label><input value="${esc(venc)}" readonly></div></div></div>
+  <div class="card" style="margin-top:12px"><h3>Detalle de la factura N° ${esc(invoice)}</h3><div class="tablewrap"><table class="tbl"><thead><tr>${headersLine.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body||'<tr><td colspan="6" class="empty">No hay productos asociados a esta factura.</td></tr>'}</tbody></table></div>
+  <div class="card" style="margin-top:10px"><b>Total factura: ${money(total)}</b><br>Pago: ${money(pago)}<br>Saldo: ${money(saldo)}<br>Estado: <b>${esc(pr[9]||'')}</b></div></div>`;
+}
+function showLinkedInvoice(t,invoice){let c=document.getElementById('content');renderLinkedInvoice(c,t,num(invoice))}
+function renderInvoice(c,t){
+  const name=t==='venta'?'FACTURAS & ABONOS VENTAS':'FACTURAS & ABONOS COMPRA';
+  const list=rows(name).slice(1).filter(r=>r&&r[2]!=null&&r[2]!=='');
+  const latest=list.reduce((m,r)=>Math.max(m,num(r[2])),0);
+  if(!latest){c.innerHTML=`<div class="title">${t==='venta'?'FACTURA VENTA':'FACTURA COMPRA'}</div><div class="empty">Todavía no hay facturas registradas.</div>`;return}
+  renderLinkedInvoice(c,t,latest);
+}
+function backup(){let blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='DISTRIHUEVOS BONANZA_RESPALDO.json';a.click()}
+async function importExcel(file){if(!file)return;try{if(!window.XLSX){await loadXLSX()}let buf=await file.arrayBuffer();let wb=XLSX.read(buf,{type:'array',cellDates:true});let n={};wb.SheetNames.forEach(s=>{n[s]=XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,raw:true,defval:null})});DB=n;save();toast('Excel importado');show('menu')}catch(e){alert('No se pudo importar el Excel: '+e.message)}}
+function loadXLSX(){return new Promise((res,rej)=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+function resetTestData(){
+  const ok=confirm('¿Seguro que quieres comenzar de nuevo?\n\nSe borrarán los datos de prueba de compras, ventas, facturas, abonos, lotes, gastos y flujo de caja.\n\nSe conservarán productos, clientes, proveedores y la estructura del sistema.');
+  if(!ok)return;
+
+  // IMPORTANTE: no dejamos solo la primera fila de cada hoja.
+  // Las hojas COMPRAS/VENTAS necesitan sus encabezados para que
+  // la sincronización pueda leer las nuevas operaciones, y las hojas
+  // de cartera necesitan conservar su fila N_FACTURA + AGING.
+  const copyRows=n=>{
+    const base=INITIAL[n]||[];
+    if(!base.length)return [];
+    if(n==='COMPRAS'||n==='VENTAS') return base.slice(0,4).map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='LOTES') return base.slice(0,2).map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='FACTURA COMPRA'||n==='FACTURA VENTA') return base.map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='FACTURAS & ABONOS COMPRA'||n==='FACTURAS & ABONOS VENTAS'){
+      const out=base.slice(0,3).map(r=>Array.isArray(r)?[...r]:r);
+      // Conserva las tablas auxiliares de ABONOS/AGING, pero elimina
+      // cualquier factura/abono de prueba de las columnas principales.
+      for(let i=3;i<base.length;i++){
+        const r=Array.isArray(base[i])?[...base[i]]:[];
+        // Borra también ABONOS (FECHA/FACTURA/MONTO) para comenzar desde cero.
+        for(let j=0;j<16;j++) r[j]=null;
+        out.push(r);
+      }
+      return out;
+    }
+    if(n==='GASTOS') return (base.slice(0,3)||[]).map(r=>Array.isArray(r)?[...r]:r);
+    if(n==='FLUJO DE CAJA') return base.slice(0,2).map(r=>Array.isArray(r)?[...r]:r);
+    return base.map(r=>Array.isArray(r)?[...r]:r);
+  };
+
+  const tx=['COMPRAS','VENTAS','FACTURA VENTA','FACTURA COMPRA','FACTURAS & ABONOS VENTAS','FACTURAS & ABONOS COMPRA','LOTES','GASTOS','FLUJO DE CAJA'];
+  tx.forEach(n=>DB[n]=copyRows(n));
+
+  // Reiniciar inventario conservando los productos configurados.
+  const prod=DB['BASE DE DATOS DE PRODUCTOS']||[];
+  const phIndex=prod.findIndex(r=>Array.isArray(r)&&r.some(v=>String(v).toUpperCase().includes('CODIGO')));
+  const ph=phIndex>=0?prod[phIndex]:[];
+  const ih=(INITIAL['INVENTARIO']||[])[3]||['CODIGO','NOMBRE DEL PRODUCTO','COMPRAS','VENTAS','STOCK','COSTO UNITARIO','VALOR DEL INVENTARIO'];
+  const codeIdx=ph.findIndex(v=>String(v).toUpperCase().includes('CODIGO'));
+  const nameIdx=ph.findIndex(v=>String(v).toUpperCase().includes('NOMBRE'));
+  const invRows=[Array.isArray((INITIAL['INVENTARIO']||[])[0])?[...(INITIAL['INVENTARIO']||[])[0]]:['INVENTARIO'],[null,null,null,null,null,null,null,'TOTAL INVENTARIO'],[null,null,null,null,null,null,null,null],Array.isArray(ih)?[...ih]:ih];
+  prod.slice(phIndex+1).forEach(r=>{
+    if(!Array.isArray(r))return;
+    const code=codeIdx>=0?r[codeIdx]:r[0];
+    const name=nameIdx>=0?r[nameIdx]:r[1];
+    if(code && name) invRows.push([code,name,0,0,0,0,0]);
+  });
+  DB['INVENTARIO']=invRows;
+
+  // Reconstrucción final: debe quedar lista para que la primera compra
+  // aparezca inmediatamente en INVENTARIO y en FACTURAS & ABONOS COMPRA.
+  ensureInvoiceLinks();
+  normalizeInventory();
+  save();
+  toast('Sistema reiniciado correctamente: estructura conservada y movimientos en cero');
+  show('menu');
+}
+async function exportExcel(){try{if(!window.XLSX)await loadXLSX();let wb=XLSX.utils.book_new();sheets.forEach(name=>{let ws=XLSX.utils.aoa_to_sheet(DB[name]||[]);XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31))});XLSX.writeFile(wb,'DISTRIHUEVOS BONANZA_APP.xlsx')}catch(e){alert('No se pudo exportar: '+e.message)}}
+setInterval(()=>{const c=document.getElementById('clock');if(c)c.textContent=new Date().toLocaleString('es-CO')},1000);
+if(isLoggedIn()){enterApp()}else{renderAuthScreen()}
+</script></body></html>
